@@ -1,0 +1,184 @@
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Onze <span class="text-blue-600">Tarieven</span></h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Transparante prijzen zonder verborgen kosten. Kies het voertuig dat bij uw wensen past.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Standard Taxi -->
+                <div class="bg-gray-50 rounded-xl shadow-lg overflow-hidden transition-transform hover:transform hover:scale-105">
+                    <div class="bg-blue-600 text-white p-6 text-center">
+                        <h3 class="text-2xl font-bold">Standaard</h3>
+                        <div class="text-yellow-300 text-4xl mt-2 font-bold">€2,50<span class="text-sm">/km</span></div>
+                        <p class="mt-2 text-blue-100">+ €2,95 instaptarief</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-center mb-6">
+                            <i class="fas fa-taxi text-5xl text-blue-600"></i>
+                        </div>
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Tot 4 passagiers</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Toyota Prius of vergelijkbaar</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Airconditioning</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>3 koffers maximaal</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Gratis wachttijd (10 min)</span>
+                            </li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="#booking" class="block text-center py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition duration-300">
+                                <i class="fas fa-taxi mr-2"></i> Nu Boeken
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Comfort Taxi -->
+                <div class="bg-gray-50 rounded-xl shadow-xl overflow-hidden transform scale-105 border-2 border-yellow-400">
+                    <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white p-6 text-center relative">
+                        <div class="absolute top-0 right-0 bg-yellow-400 text-blue-900 py-1 px-4 text-sm font-bold rounded-bl-lg">POPULAIR</div>
+                        <h3 class="text-2xl font-bold">Comfort</h3>
+                        <div class="text-yellow-300 text-4xl mt-2 font-bold">€3,25<span class="text-sm">/km</span></div>
+                        <p class="mt-2 text-blue-100">+ €4,50 instaptarief</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-center mb-6">
+                            <i class="fas fa-car-side text-5xl text-blue-600"></i>
+                        </div>
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Tot 4 passagiers</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Mercedes E-Klasse of vergelijkbaar</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Climate control</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>4 koffers maximaal</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Gratis wachttijd (15 min)</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Gratis water</span>
+                            </li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="#booking" class="block text-center py-3 bg-yellow-400 text-blue-900 font-bold rounded-lg hover:bg-yellow-500 transition duration-300">
+                                <i class="fas fa-car-side mr-2"></i> Nu Boeken
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Van Taxi -->
+                <div class="bg-gray-50 rounded-xl shadow-lg overflow-hidden transition-transform hover:transform hover:scale-105">
+                    <div class="bg-blue-600 text-white p-6 text-center">
+                        <h3 class="text-2xl font-bold">Van</h3>
+                        <div class="text-yellow-300 text-4xl mt-2 font-bold">€3,95<span class="text-sm">/km</span></div>
+                        <p class="mt-2 text-blue-100">+ €5,95 instaptarief</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-center mb-6">
+                            <i class="fas fa-shuttle-van text-5xl text-blue-600"></i>
+                        </div>
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Tot 8 passagiers</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Mercedes V-Klasse of vergelijkbaar</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Climate control</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>6+ koffers maximaal</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Gratis wachttijd (15 min)</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                <span>Ideaal voor groepen en families</span>
+                            </li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="#booking" class="block text-center py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition duration-300">
+                                <i class="fas fa-shuttle-van mr-2"></i> Nu Boeken
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Extra pricing info -->
+            <div class="max-w-4xl mx-auto mt-12 bg-blue-50 rounded-xl p-6 border border-blue-100">
+                <h3 class="text-xl font-bold mb-4 text-blue-800">Extra informatie over tarieven</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-bold text-blue-600 mb-2">Standaard Tarieven</h4>
+                        <ul class="space-y-2 text-gray-700">
+                            <li class="flex justify-between">
+                                <span>Instaptarief:</span>
+                                <span class="font-medium">Vanaf €2,95</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>Prijs per kilometer:</span>
+                                <span class="font-medium">Vanaf €2,50</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>Wachttijd:</span>
+                                <span class="font-medium">€0,50 per minuut</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-blue-600 mb-2">Extra services</h4>
+                        <ul class="space-y-2 text-gray-700">
+                            <li class="flex justify-between">
+                                <span>Bagage service:</span>
+                                <span class="font-medium">Inbegrepen</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>Kinderzitje:</span>
+                                <span class="font-medium">€5,00 per rit</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>Huisdieren:</span>
+                                <span class="font-medium">€7,50 toeslag</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>

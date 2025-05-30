@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boeking Bevestigd - TaxiToday.nl</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-sans antialiased text-gray-800 bg-gray-100">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="index.html" class="text-2xl font-bold text-blue-600 flex items-center">
+                    <img src="uploads/TaxiToday Logo.png" alt="TaxiToday" class="h-10 mr-2">
+                    <span>Taxi<span class="text-blue-800">Today</span></span>
+                </a>
+                <span class="ml-2 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">NL</span>
+            </div>
+            
+            <nav class="hidden md:flex space-x-8">
+                <a href="index.html#pricing" class="nav-link font-medium hover:text-blue-600">Prijzen</a>
+                <a href="index.html#service" class="nav-link font-medium hover:text-blue-600">Service</a>
+                <a href="index.html#about" class="nav-link font-medium hover:text-blue-600">Over ons</a>
+                <a href="index.html#contact" class="nav-link font-medium hover:text-blue-600">Contact</a>
+                <a href="login.html" class="nav-link font-medium hover:text-blue-600">Login</a>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <a href="tel:+31202613210" class="hidden md:flex items-center text-blue-600 font-medium">
+                    <i class="fas fa-phone-alt mr-2"></i>
+                    020 261 32 10
+                </a>
+                <button class="md:hidden text-gray-600" id="mobileMenuBtn">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white py-2 px-4 shadow-lg">
+            <a href="index.html#pricing" class="block py-2 hover:text-blue-600">Prijzen</a>
+            <a href="index.html#service" class="block py-2 hover:text-blue-600">Service</a>
+            <a href="index.html#about" class="block py-2 hover:text-blue-600">Over ons</a>
+            <a href="index.html#contact" class="block py-2 hover:text-blue-600">Contact</a>
+            <a href="login.html" class="block py-2 hover:text-blue-600">Login</a>
+            <a href="tel:+31202613210" class="block py-2 text-blue-600 font-medium">
+                <i class="fas fa-phone-alt mr-2"></i>
+                020 261 32 10
+            </a>
+        </div>
+    </header>
+
+    <!-- Confirmation Section -->
+    <section class="py-16 md:py-24">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 md:p-8 booking-confirmation">
+                    <div class="text-center mb-8">
+                        <div class="inline-block p-4 bg-green-100 rounded-full text-green-600 text-4xl mb-4">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h1 class="text-3xl md:text-4xl font-bold mb-2">Boeking Bevestigd!</h1>
+                        <p class="text-gray-600">Bedankt voor uw boeking bij TaxiToday.</p>
+                    </div>
+                    
+                    <div class="border-2 border-dashed border-gray-200 rounded-lg p-6 mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold">Boekingsdetails</h2>
+                            <span id="bookingReference" class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-medium">REF: XXXX0000</span>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-sm text-gray-600 mb-1">Ophaaladres</h3>
+                                <p id="pickupAddress" class="font-medium">Ophaaladres wordt geladen...</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm text-gray-600 mb-1">Bestemmingsadres</h3>
+                                <p id="destinationAddress" class="font-medium">Bestemmingsadres wordt geladen...</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm text-gray-600 mb-1">Datum & Tijd</h3>
+                                <p id="dateTime" class="font-medium">Datum/tijd wordt geladen...</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm text-gray-600 mb-1">Passagiers</h3>
+                                <p id="passengers" class="font-medium">Aantal wordt geladen...</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm text-gray-600 mb-1">Voertuigtype</h3>
+                                <p id="vehicleType" class="font-medium">Voertuig wordt geladen...</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm text-gray-600 mb-1">Betaalmethode</h3>
+                                <p id="paymentMethod" class="font-medium">Betaalmethode wordt geladen...</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="text-sm text-gray-600 mb-1">Geschatte afstand</h3>
+                                    <p id="distance" class="font-medium">Afstand wordt geladen...</p>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm text-gray-600 mb-1">Geschatte tijd</h3>
+                                    <p id="duration" class="font-medium">Tijd wordt geladen...</p>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm text-gray-600 mb-1">Totaalprijs (incl. BTW)</h3>
+                                    <p id="price" class="text-xl font-bold text-blue-600">Prijs wordt geladen...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                        <h2 class="text-lg font-bold mb-3">Wat gebeurt er nu?</h2>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <span>We hebben uw boeking bevestigd en u ontvangt een e-mailbevestiging.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <span>Er wordt een chauffeur toegewezen aan uw rit.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <span>U ontvangt een sms met de gegevens van uw chauffeur 15 minuten voor de ophaaltijd.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                        <button id="printBtn" class="btn-secondary w-full md:w-auto md:flex-1">
+                            <i class="fas fa-print mr-2"></i> Afdrukken
+                        </button>
+                        <button id="emailBtn" class="btn-secondary w-full md:w-auto md:flex-1">
+                            <i class="fas fa-envelope mr-2"></i> E-mail opnieuw versturen
+                        </button>
+                        <a href="index.html" class="btn-primary w-full md:w-auto md:flex-1 text-center">
+                            <i class="fas fa-home mr-2"></i> Terug naar Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ElevenLabs Convai Agent -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <elevenlabs-convai agent-id="agent_01jvfmapr8e6f8mn92sex8797s"></elevenlabs-convai>
+        <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="md:flex md:justify-between">
+                <div class="mb-6 md:mb-0">
+                    <a href="index.html" class="text-2xl font-bold text-white flex items-center">
+                        <img src="uploads/TaxiToday Logo.png" alt="TaxiToday" class="h-10 mr-2">
+                        <span>Taxi<span class="text-blue-400">Today</span></span>
+                    </a>
+                    <p class="mt-2 text-gray-400">Professionele taxiservice in heel Nederland.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-8 sm:grid-cols-3">
+                    <div>
+                        <h3 class="font-bold mb-3">Links</h3>
+                        <ul class="space-y-2">
+                            <li><a href="index.html#booking" class="text-gray-400 hover:text-white">Boek een taxi</a></li>
+                            <li><a href="index.html#pricing" class="text-gray-400 hover:text-white">Prijzen</a></li>
+                            <li><a href="index.html#about" class="text-gray-400 hover:text-white">Over ons</a></li>
+                            <li><a href="index.html#contact" class="text-gray-400 hover:text-white">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-3">Contact</h3>
+                        <ul class="space-y-2">
+                            <li class="text-gray-400">020 261 32 10</li>
+                            <li class="text-gray-400">info@taxitoday.nl</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-gray-700 md:flex md:justify-between">
+                <p class="text-gray-400 text-sm">© 2024 TaxiToday. Alle rechten voorbehouden.</p>
+                <div class="flex mt-4 md:mt-0 space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get booking reference from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookingRef = urlParams.get('ref') || 'DEMO1234';
+            document.getElementById('bookingReference').textContent = 'REF: ' + bookingRef;
+            
+            // In a real application, this data would come from the server
+            // For demo purposes, we'll use sample data
+            const bookingData = {
+                pickup: 'Centraal Station, Amsterdam',
+                destination: 'Schiphol Airport, Haarlemmermeer',
+                date: '30-05-2024',
+                time: '14:30',
+                passengers: '2 personen',
+                vehicleType: 'Standaard Taxi',
+                paymentMethod: 'Pin in taxi',
+                distance: '22.5 km',
+                duration: '35 min',
+                price: '€ 65,25'
+            };
+            
+            // Fill in booking details
+            document.getElementById('pickupAddress').textContent = bookingData.pickup;
+            document.getElementById('destinationAddress').textContent = bookingData.destination;
+            document.getElementById('dateTime').textContent = bookingData.date + ' om ' + bookingData.time;
+            document.getElementById('passengers').textContent = bookingData.passengers;
+            document.getElementById('vehicleType').textContent = bookingData.vehicleType;
+            document.getElementById('paymentMethod').textContent = bookingData.paymentMethod;
+            document.getElementById('distance').textContent = bookingData.distance;
+            document.getElementById('duration').textContent = bookingData.duration;
+            document.getElementById('price').textContent = bookingData.price;
+            
+            // Print function
+            document.getElementById('printBtn').addEventListener('click', function() {
+                window.print();
+            });
+            
+            // Re-send email function
+            document.getElementById('emailBtn').addEventListener('click', function() {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Versturen...';
+                this.disabled = true;
+                
+                // Simulate sending email
+                setTimeout(() => {
+                    alert('Bevestiging opnieuw verstuurd naar het opgegeven e-mailadres.');
+                    this.innerHTML = '<i class="fas fa-envelope mr-2"></i> E-mail opnieuw versturen';
+                    this.disabled = false;
+                }, 1500);
+            });
+            
+            // Mobile menu toggle
+            document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+                document.getElementById('mobileMenu').classList.toggle('hidden');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+    <!-- Services Section -->
+    <section id="service" class="py-16 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Onze <span class="text-blue-600">Services</span></h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">TaxiToday biedt een breed scala aan taxidiensten voor diverse behoeften.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Airport Transfer -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-48 bg-blue-600 flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20 bg-center bg-cover" style="background-image: url('https://images.unsplash.com/photo-1582308292407-7776089e6e55?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80');"></div>
+                        <i class="fas fa-plane-departure text-white text-7xl relative z-10"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Luchthaventransfer</h3>
+                        <p class="text-gray-600 mb-4">Betrouwbaar vervoer van en naar alle nationale en internationale luchthavens. Inclusief vluchtmonitoring en aangepaste wachttijd.</p>
+                        <ul class="space-y-2 mb-4">
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span class="text-sm text-gray-700">Vluchtmonitoring inbegrepen</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span class="text-sm text-gray-700">Meet & greet service</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span class="text-sm text-gray-700">24/7 beschikbaar</span>
+                            </li>
+                        </ul>
+                        <a href="#booking" class="text-blue-600 font-medium flex items-center hover:text-blue-800">
+                            <span>Nu boeken</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Business Travel -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-48 bg-blue-800 flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20 bg-center bg-cover" style="background-image: url('https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80');"></div>
+                        <i class="fas fa-briefcase text-white text-7xl relative z-10"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Zakelijk Vervoer</h3>
+                        <p class="text-gray-600 mb-4">Professionele taxiservice voor zakelijke reizigers. Discrete en comfortabele rit met WiFi en mogelijkheid tot facturering.</p>
+                        <ul class="space-y-2 mb-4">
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span class="text-sm text-gray-700">Vaste chauffeurs beschikbaar</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span class="text-sm text-gray-700">Zakelijke facturatie mogelijk</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span class="text-sm text-gray-700">Gratis WiFi in de taxi</span>
+                            </li>
+                        </ul>
+                        <a href="#booking" class="text-blue-600 font-medium flex items-center hover:text-blue-800">
+                            <span>Nu boeken</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Event Transportation -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-48 bg-blue-700 flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20 bg-center bg-cover" style="background-image: url('https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80');"></div>
+                        <i class="fas fa-glass-cheers text-white text-7xl relative z-10"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Evenementen Vervoer</h3>
+                        <p class="text-gray-600 mb-4">Vervoer voor bruiloften, feesten, congressen en andere evenementen. Comfortabel groepsvervoer met mogelijkheid tot reservering vooraf.</p>
+                        <ul class="space-y-2 mb-4">
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span class="text-sm text-gray-700">Groepskorting beschikbaar</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span class="text-sm text-gray-700">Gepersonaliseerde service</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span class="text-sm text-gray-700">Luxe voertuigen beschikbaar</span>
+                            </li>
+                        </ul>
+                        <a href="#booking" class="text-blue-600 font-medium flex items-center hover:text-blue-800">
+                            <span>Nu boeken</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Services Showcase -->
+            <div class="grid md:grid-cols-2 gap-8 mt-12">
+                <!-- Medical Transportation -->
+                <div class="flex bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="bg-blue-600 flex items-center justify-center px-6">
+                        <i class="fas fa-ambulance text-white text-4xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold mb-2">Medisch Vervoer</h3>
+                        <p class="text-gray-600">Speciaal vervoer voor medische afspraken. Onze chauffeurs zijn getraind om extra zorg en aandacht te bieden aan passagiers met medische behoeften.</p>
+                        <a href="contact.html" class="mt-3 text-blue-600 font-medium flex items-center hover:text-blue-800">
+                            <span>Meer informatie</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Fixed Routes -->
+                <div class="flex bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="bg-blue-600 flex items-center justify-center px-6">
+                        <i class="fas fa-route text-white text-4xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold mb-2">Vaste Routes & Contracten</h3>
+                        <p class="text-gray-600">Speciale tarieven voor regelmatig vervoer en vaste routes. Ideaal voor bedrijven en organisaties met regelmatige vervoersbehoeften.</p>
+                        <a href="contact.html" class="mt-3 text-blue-600 font-medium flex items-center hover:text-blue-800">
+                            <span>Offerte aanvragen</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Call to Action -->
+            <div class="mt-12 text-center">
+                <h3 class="text-2xl font-bold mb-4">Heeft u een specifieke wens?</h3>
+                <p class="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">Wij staan altijd klaar om aan uw specifieke vervoersbehoeften te voldoen. Neem contact met ons op voor een persoonlijk aanbod.</p>
+                <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-4">
+                    <a href="contact.html" class="btn-primary">
+                        <i class="fas fa-envelope mr-2"></i> Contact Opnemen
+                    </a>
+                    <a href="tel:+31202613210" class="btn-secondary bg-blue-600 hover:bg-blue-700 text-white">
+                        <i class="fas fa-phone-alt mr-2"></i> 020 261 32 10
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>

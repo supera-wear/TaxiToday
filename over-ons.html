@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Over Ons - TaxiToday.nl - Betrouwbaar en Comfortabel Taxivervoer</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+</head>
+<body class="font-sans antialiased text-gray-800">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="index.html" class="text-2xl font-bold text-blue-600 flex items-center">
+                    <img src="uploads/TaxiTodayLogo_Blue.png" alt="TaxiToday" class="h-10 mr-2">
+                </a>
+                <!-- Header Search Bar -->
+                <div class="ml-4 relative hidden md:block">
+                    <div class="relative">
+                        <input type="text" id="header-search" class="w-64 pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Zoek locatie...">
+                        <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex space-x-8">
+                <a href="index.html#pricing" class="nav-link font-medium hover:text-blue-600">Prijzen</a>
+                <a href="index.html#service" class="nav-link font-medium hover:text-blue-600">Service</a>
+                <a href="over-ons.html" class="nav-link font-medium text-blue-600">Over ons</a>
+                <a href="contact.html" class="nav-link font-medium hover:text-blue-600">Contact</a>
+                <!-- Auth buttons - will be toggled by JavaScript based on auth status -->
+                <a href="login.html" class="nav-link font-medium hover:text-blue-600 login-btn">Login</a>
+                <a href="profile.html" class="nav-link font-medium text-blue-600 profile-btn hidden">
+                    <i class="fas fa-user-circle mr-1"></i> Mijn Profiel
+                </a>
+                <button class="nav-link font-medium hover:text-red-600 logout-btn hidden">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Uitloggen
+                </button>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <a href="tel:+31202613210" class="hidden md:flex items-center text-blue-600 font-medium">
+                    <i class="fas fa-phone-alt mr-2"></i>
+                    020 261 32 10
+                </a>
+                <button class="md:hidden text-gray-600" id="mobileMenuBtn">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white py-2 px-4 shadow-lg">
+            <a href="index.html#pricing" class="block py-2 hover:text-blue-600">Prijzen</a>
+            <a href="index.html#service" class="block py-2 hover:text-blue-600">Service</a>
+            <a href="over-ons.html" class="block py-2 text-blue-600">Over ons</a>
+            <a href="contact.html" class="block py-2 hover:text-blue-600">Contact</a>
+            <!-- Auth links - will be toggled by JavaScript based on auth status -->
+            <a href="login.html" class="block py-2 hover:text-blue-600 login-btn">Login</a>
+            <a href="profile.html" class="block py-2 text-blue-600 profile-btn hidden">
+                <i class="fas fa-user-circle mr-1"></i> Mijn Profiel
+            </a>
+            <button class="block py-2 hover:text-red-600 w-full text-left logout-btn hidden">
+                <i class="fas fa-sign-out-alt mr-1"></i> Uitloggen
+            </button>
+            <a href="tel:+31202613210" class="block py-2 text-blue-600 font-medium">
+                <i class="fas fa-phone-alt mr-2"></i>
+                020 261 32 10
+            </a>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Over <span class="text-yellow-400">TaxiToday</span></h1>
+            <p class="text-xl max-w-3xl mx-auto">Leer meer over ons team, onze geschiedenis en waarom wij de beste keuze zijn voor uw taxivervoer</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="py-16">
+        <div class="container mx-auto px-4">
+            <!-- Our Story -->
+            <div class="max-w-4xl mx-auto mb-16">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold mb-4">Ons <span class="text-blue-600">Verhaal</span></h2>
+                    <p class="text-xl text-gray-600">Hoe TaxiToday uitgroeide tot een toonaangevende taxiservice in Nederland</p>
+                </div>
+                
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="md:w-1/2">
+                        <img src="https://images.unsplash.com/photo-1616805765512-1be182a47e0a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="TaxiToday Oprichters" class="rounded-lg shadow-lg w-full">
+                    </div>
+                    <div class="md:w-1/2">
+                        <h3 class="text-2xl font-bold text-blue-800 mb-4">Van start-up naar marktleider</h3>
+                        <p class="mb-4">TaxiToday begon in 2015 als een klein familiebedrijf met slechts twee taxi's in Amsterdam. Opgericht door Jan en Petra de Vries, die een passie hadden voor uitmuntende klantenservice en betrouwbaar vervoer.</p>
+                        <p class="mb-4">Met de jaren groeide ons bedrijf gestaag. In 2018 lanceerden we onze eerste mobiele app en breidde ons wagenpark uit tot 25 voertuigen. Vandaag de dag zijn we trots om meer dan 100 professionele chauffeurs te hebben die dagelijks duizenden reizigers veilig naar hun bestemming brengen.</p>
+                        <p>Onze focus op klanttevredenheid, milieuvriendelijke voertuigen en innovatieve technologie heeft ons geholpen uit te groeien tot een van de meest vertrouwde taxibedrijven in heel Nederland.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mission & Vision -->
+            <div class="max-w-4xl mx-auto mb-16 bg-blue-50 rounded-xl p-8 border border-blue-100">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-blue-800 mb-4">Onze Missie</h3>
+                        <p class="text-gray-700">TaxiToday streeft ernaar om de meest betrouwbare, comfortabele en klantvriendelijke taxiservice in Nederland te bieden. Wij zetten ons in om elke rit een aangename ervaring te maken door te focussen op veiligheid, stiptheid en persoonlijke service.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-blue-800 mb-4">Onze Visie</h3>
+                        <p class="text-gray-700">Wij streven ernaar om de transportsector te transformeren door innovatie, duurzaamheid en klantgerichtheid. Ons doel is om volledig CO2-neutraal te zijn tegen 2030 en tegelijkertijd de gouden standaard te zetten voor klantervaring in taxivervoer.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Our Values -->
+            <div class="max-w-4xl mx-auto mb-16">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold mb-4">Onze <span class="text-blue-600">Kernwaarden</span></h2>
+                    <p class="text-xl text-gray-600">De principes die ons elke dag leiden</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 flex flex-col items-center text-center">
+                        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-shield-alt text-2xl text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Veiligheid</h3>
+                        <p class="text-gray-600">De veiligheid van onze passagiers staat altijd voorop. Al onze chauffeurs zijn gecertificeerd en onze voertuigen worden regelmatig gecontroleerd.</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 flex flex-col items-center text-center">
+                        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-clock text-2xl text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Betrouwbaarheid</h3>
+                        <p class="text-gray-600">Stiptheid en betrouwbaarheid zijn essentieel. U kunt erop rekenen dat we altijd op tijd zijn en u veilig naar uw bestemming brengen.</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 flex flex-col items-center text-center">
+                        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-leaf text-2xl text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Duurzaamheid</h3>
+                        <p class="text-gray-600">We investeren voortdurend in milieuvriendelijke voertuigen en zijn toegewijd aan het verkleinen van onze ecologische voetafdruk.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Our Team -->
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold mb-4">Ons <span class="text-blue-600">Team</span></h2>
+                    <p class="text-xl text-gray-600">De mensen achter TaxiToday</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Team Member 1 -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="h-64 bg-gray-200 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" alt="Jan de Vries" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-bold text-xl mb-1">Jan de Vries</h3>
+                            <p class="text-blue-600 mb-3">Oprichter & CEO</p>
+                            <p class="text-gray-600 text-sm">Jan heeft meer dan 20 jaar ervaring in de transportsector en leidt TaxiToday met een focus op innovatie en klantservice.</p>
+                            <div class="mt-4 flex space-x-3">
+                                <a href="#" class="text-gray-400 hover:text-blue-600">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                <a href="#" class="text-gray-400 hover:text-blue-600">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="text-gray-400 hover:text-blue-600">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Member 2 -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="h-64 bg-gray-200 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=688&q=80" alt="Petra de Vries" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-bold text-xl mb-1">Petra de Vries</h3>
+                            <p class="text-blue-600 mb-3">Medeoprichter & COO</p>
+                            <p class="text-gray-600 text-sm">Petra overziet de dagelijkse operaties en zorgt ervoor dat onze service voldoet aan de hoogste kwaliteitsstandaarden.</p>
+                            <div class="mt-4 flex space-x-3">
+                                <a href="#" class="text-gray-400 hover:text-blue-600">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                <a href="#" class="text-gray-400 hover:text-blue-600">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="text-gray-400 hover:text-blue-600">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Member 3 -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="h-64 bg-gray-200 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" alt="Martijn Bakker" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-bold text-xl mb-1">Martijn Bakker</h3>
+                            <p class="text-blue-600 mb-3">Technisch Directeur</p>
+                            <p class="text-gray-600 text-sm">Martijn leidt onze technologieafdeling en is verantwoordelijk voor onze innovatieve boekingsplatformen en apps.</p>
+                            <div class="mt-4 flex space-x-3">
+                                <a href="#" class="text-gray-400 hover:text-blue-600">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                <a href="#" class="text-gray-400 hover:text-blue-600">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="text-gray-400 hover:text-blue-600">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="max-w-4xl mx-auto mt-20">
+                <div class="bg-blue-700 rounded-xl p-8 md:p-12 text-white">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold mb-4">TaxiToday <span class="text-yellow-400">in Cijfers</span></h2>
+                        <p class="text-xl">Onze impact door de jaren heen</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                        <div class="text-center">
+                            <div class="text-4xl md:text-5xl font-bold text-yellow-400">100+</div>
+                            <p class="mt-2">Chauffeurs</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl md:text-5xl font-bold text-yellow-400">75+</div>
+                            <p class="mt-2">Voertuigen</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl md:text-5xl font-bold text-yellow-400">250K+</div>
+                            <p class="mt-2">Ritten per jaar</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl md:text-5xl font-bold text-yellow-400">4.9/5</div>
+                            <p class="mt-2">Klantwaardering</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="max-w-4xl mx-auto mt-16 text-center">
+                <h2 class="text-3xl font-bold mb-4">Klaar om onze service te ervaren?</h2>
+                <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">Boek nu een taxi en ervaar het verschil dat TaxiToday maakt in uw taxirit.</p>
+                <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-4">
+                    <a href="index.html#booking" class="btn-primary">
+                        <i class="fas fa-taxi mr-2"></i> Taxi Boeken
+                    </a>
+                    <a href="contact.html" class="btn-secondary">
+                        <i class="fas fa-envelope mr-2"></i> Contact Opnemen
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ElevenLabs Convai Agent -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <elevenlabs-convai agent-id="agent_01jvfmapr8e6f8mn92sex8797s"></elevenlabs-convai>
+        <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-16">
+        <div class="container mx-auto px-4">
+            <div class="md:flex md:justify-between">
+                <div class="mb-6 md:mb-0">
+                    <a href="index.html" class="text-2xl font-bold text-white flex items-center">
+                        <img src="uploads/TaxiToday Logo_white.png" alt="TaxiToday" class="h-10 mr-2">
+                    </a>
+                    <p class="mt-2 text-gray-400">Professionele taxiservice in heel Nederland.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-8 sm:grid-cols-3">
+                    <div>
+                        <h3 class="font-bold mb-3">Links</h3>
+                        <ul class="space-y-2">
+                            <li><a href="index.html#booking" class="text-gray-400 hover:text-white">Boek een taxi</a></li>
+                            <li><a href="index.html#pricing" class="text-gray-400 hover:text-white">Prijzen</a></li>
+                            <li><a href="over-ons.html" class="text-gray-400 hover:text-white">Over ons</a></li>
+                            <li><a href="contact.html" class="text-gray-400 hover:text-white">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-3">Contact</h3>
+                        <ul class="space-y-2">
+                            <li class="text-gray-400">020 261 32 10</li>
+                            <li class="text-gray-400">info@taxitoday.nl</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-gray-700 md:flex md:justify-between">
+                <div>
+                    <p class="text-gray-400 text-sm">© 2024 TaxiToday. Alle rechten voorbehouden.</p>
+                    <div class="flex space-x-4 mt-2">
+                        <a href="algemene-voorwaarden.html" class="text-gray-400 text-sm hover:text-white">Algemene voorwaarden</a>
+                        <a href="privacybeleid.html" class="text-gray-400 text-sm hover:text-white">Privacybeleid</a>
+                    </div>
+                </div>
+                <div class="flex mt-4 md:mt-0 space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="login.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
