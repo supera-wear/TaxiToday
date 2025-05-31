@@ -1,1 +1,1 @@
-{"name":"taxitoday-website","version":"1.0.0","description":"TaxiToday Taxi Booking Website","scripts":{"start":"node api/server.js"},"dependencies":{"body-parser":"^2.2.0","cors":"^2.8.5","express":"^5.1.0"}}
+{"name":"taxitoday-website","version":"1.0.0","description":"TaxiToday Taxi Booking Website","scripts":{"start":"node server.js"},"dependencies":{"body-parser":"^2.2.0","cors":"^2.8.5","express":"^5.1.0"}}
