@@ -5,126 +5,130 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TaxiToday.nl - Betrouwbaar en Comfortabel Taxivervoer</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css" />
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-<body class="font-sans antialiased text-gray-800">
-  <!-- Header -->
-  <header class="bg-white shadow-sm sticky top-0 z-50">
-    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center">
-        <a href="index.html" class="text-2xl font-bold text-blue-600 flex items-center">
-          <img src="TaxiTodayLogo_Blue.png" alt="TaxiToday" class="h-10 mr-2" />
-        </a>
-        <div class="ml-4 relative hidden md:block">
-          <div class="relative">
-            <input type="text" id="header-search" class="w-64 pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Zoek locatie..." />
-            <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
-              <i class="fas fa-search text-gray-400"></i>
-            </div>
-          </div>
-        </div>
-      </div>
+<body class="bg-white text-gray-800 font-sans">
 
-      <nav class="hidden md:flex space-x-8">
-        <a href="#pricing" class="nav-link font-medium hover:text-blue-600">Prijzen</a>
-        <a href="#service" class="nav-link font-medium hover:text-blue-600">Service</a>
-        <a href="over-ons.html" class="nav-link font-medium hover:text-blue-600">Over ons</a>
-        <a href="contact.html" class="nav-link font-medium hover:text-blue-600">Contact</a>
-        <a href="login.html" class="nav-link font-medium hover:text-blue-600 login-btn">Login</a>
-        <a href="profile.html" class="nav-link font-medium text-blue-600 profile-btn hidden">
-          <i class="fas fa-user-circle mr-1"></i> Mijn Profiel
-        </a>
-        <button class="nav-link font-medium hover:text-red-600 logout-btn hidden">
-          <i class="fas fa-sign-out-alt mr-1"></i> Uitloggen
-        </button>
+  <!-- HEADER -->
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="/">
+        <img src="/TaxiTodayLogo_Blue.png" alt="TaxiToday Logo" class="h-10">
+      </a>
+      <nav class="hidden md:flex space-x-6">
+        <a href="#booking" class="hover:text-blue-600">Boek</a>
+        <a href="#pricing" class="hover:text-blue-600">Prijzen</a>
+        <a href="#services" class="hover:text-blue-600">Service</a>
+        <a href="over-ons.html" class="hover:text-blue-600">Over ons</a>
+        <a href="contact.html" class="hover:text-blue-600">Contact</a>
       </nav>
-
-      <div class="flex items-center space-x-4">
-        <a href="tel:+31202613210" class="hidden md:flex items-center text-blue-600 font-medium">
-          <i class="fas fa-phone-alt mr-2"></i>
-          020 261 32 10
-        </a>
-        <button class="md:hidden text-gray-600" id="mobileMenuBtn">
-          <i class="fas fa-bars text-2xl"></i>
-        </button>
+      <div class="text-sm text-blue-600 hidden md:block">
+        <i class="fas fa-phone mr-1"></i> 020 261 32 10
       </div>
-    </div>
-
-    <!-- Mobile menu -->
-    <div id="mobileMenu" class="hidden md:hidden bg-white py-2 px-4 shadow-lg">
-      <a href="#pricing" class="block py-2 hover:text-blue-600">Prijzen</a>
-      <a href="#service" class="block py-2 hover:text-blue-600">Service</a>
-      <a href="over-ons.html" class="block py-2 hover:text-blue-600">Over ons</a>
-      <a href="contact.html" class="block py-2 hover:text-blue-600">Contact</a>
-      <a href="login.html" class="block py-2 hover:text-blue-600 login-btn">Login</a>
-      <a href="profile.html" class="block py-2 text-blue-600 profile-btn hidden">
-        <i class="fas fa-user-circle mr-1"></i> Mijn Profiel
-      </a>
-      <button class="block py-2 hover:text-red-600 w-full text-left logout-btn hidden">
-        <i class="fas fa-sign-out-alt mr-1"></i> Uitloggen
-      </button>
-      <a href="tel:+31202613210" class="block py-2 text-blue-600 font-medium">
-        <i class="fas fa-phone-alt mr-2"></i>
-        020 261 32 10
-      </a>
     </div>
   </header>
 
-  <!-- Hero + Booking + Pricing + Services hierna -->
-  <!-- Plaats hier je volledige content van de homepagina: hero sectie, boekingsformulier, populaire routes, tarieven, services, enz. -->
-  
-  <!-- Footer -->
-  <footer class="bg-gray-900 text-white py-8">
-    <div class="container mx-auto px-4">
-      <div class="md:flex md:justify-between">
-        <div class="mb-6 md:mb-0">
-          <a href="#" class="text-2xl font-bold text-white flex items-center">
-            <img src="TaxiToday Logo_white.png" alt="TaxiToday" class="h-10 mr-2" />
-          </a>
-          <p class="mt-2 text-gray-400">Professionele taxiservice in heel Nederland.</p>
+  <!-- HERO -->
+  <section class="bg-gray-100 py-16 text-center" id="booking">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-4xl font-bold mb-4">Boek snel en eenvoudig je taxi</h1>
+      <p class="text-gray-600 mb-6">TaxiToday staat 24/7 voor je klaar in heel Nederland</p>
+    </div>
+  </section>
+
+  <!-- MAPBOX -->
+  <section class="w-full h-96">
+    <div id="map" class="w-full h-full rounded-lg shadow"></div>
+  </section>
+
+  <!-- PRIJZEN -->
+  <section class="py-16 px-4 bg-white" id="pricing">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-8">Onze tarieven</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="p-6 border rounded shadow">
+          <h3 class="text-xl font-semibold mb-2">Stadsritten</h3>
+          <p class="text-gray-600">Vanaf €2,95 per km</p>
         </div>
-        <div class="grid grid-cols-2 gap-8 sm:grid-cols-3">
-          <div>
-            <h3 class="font-bold mb-3">Links</h3>
-            <ul class="space-y-2">
-              <li><a href="#booking" class="text-gray-400 hover:text-white">Boek een taxi</a></li>
-              <li><a href="#pricing" class="text-gray-400 hover:text-white">Prijzen</a></li>
-              <li><a href="over-ons.html" class="text-gray-400 hover:text-white">Over ons</a></li>
-              <li><a href="contact.html" class="text-gray-400 hover:text-white">Contact</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-bold mb-3">Contact</h3>
-            <ul class="space-y-2">
-              <li class="text-gray-400">020 261 32 10</li>
-              <li class="text-gray-400">info@taxitoday.nl</li>
-            </ul>
-          </div>
+        <div class="p-6 border rounded shadow">
+          <h3 class="text-xl font-semibold mb-2">Luchthavenvervoer</h3>
+          <p class="text-gray-600">Schiphol vanaf €35,-</p>
         </div>
-      </div>
-      <div class="mt-8 pt-6 border-t border-gray-700 md:flex md:justify-between">
-        <div>
-          <p class="text-gray-400 text-sm">© 2024 TaxiToday. Alle rechten voorbehouden.</p>
-          <div class="flex space-x-4 mt-2">
-            <a href="algemene-voorwaarden.html" class="text-gray-400 text-sm hover:text-white">Algemene voorwaarden</a>
-            <a href="privacybeleid.html" class="text-gray-400 text-sm hover:text-white">Privacybeleid</a>
-          </div>
-        </div>
-        <div class="flex mt-4 md:mt-0 space-x-4">
-          <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook"></i></a>
-          <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
-          <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+        <div class="p-6 border rounded shadow">
+          <h3 class="text-xl font-semibold mb-2">Zakelijk vervoer</h3>
+          <p class="text-gray-600">Op rekening mogelijk</p>
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="py-16 px-4 bg-gray-50" id="services">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-8">Onze service</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div>
+          <i class="fas fa-clock text-blue-600 text-4xl mb-2"></i>
+          <h3 class="font-semibold text-lg">24/7 beschikbaar</h3>
+        </div>
+        <div>
+          <i class="fas fa-user-shield text-blue-600 text-4xl mb-2"></i>
+          <h3 class="font-semibold text-lg">Professionele chauffeurs</h3>
+        </div>
+        <div>
+          <i class="fas fa-car-side text-blue-600 text-4xl mb-2"></i>
+          <h3 class="font-semibold text-lg">Comfortabele voertuigen</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-900 text-white py-12">
+    <div class="max-w-6xl mx-auto px-4 md:flex md:justify-between">
+      <div>
+        <img src="/TaxiToday%20Logo_white.png" alt="TaxiToday Wit" class="h-10 mb-2">
+        <p class="text-gray-400">Professionele taxiservice in heel Nederland.</p>
+      </div>
+      <div class="mt-6 md:mt-0 grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <h4 class="font-semibold mb-2">Navigatie</h4>
+          <ul class="space-y-1 text-gray-400">
+            <li><a href="#booking" class="hover:text-white">Boeken</a></li>
+            <li><a href="#pricing" class="hover:text-white">Prijzen</a></li>
+            <li><a href="over-ons.html" class="hover:text-white">Over ons</a></li>
+            <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Contact</h4>
+          <p class="text-gray-400">Tel: 020 261 32 10</p>
+          <p class="text-gray-400">info@taxitoday.nl</p>
+        </div>
+      </div>
+    </div>
+    <div class="mt-10 border-t border-gray-700 pt-6 text-center text-gray-500 text-sm">
+      © 2024 TaxiToday. Alle rechten voorbehouden.
+    </div>
   </footer>
 
-  <script src="login.js"></script>
-  <script src="script.js"></script>
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoidWx0cmFvbmUiLCJhIjoiY21hMnltM3pvMWZvbTJrc2hsY2xhNG1maSJ9.SPMu8e7QcnGyhoLWhmeYtw';
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/dark-v11',
+      center: [4.8952, 52.3702],
+      zoom: 10
+    });
+    map.addControl(new mapboxgl.NavigationControl());
+    const geocoder = new MapboxGeocoder({ accessToken: mapboxgl.accessToken, mapboxgl });
+    map.addControl(geocoder);
+  </script>
+
 </body>
 </html>
