@@ -10,17 +10,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '/')));
+app.use(express.static(path.join(__dirname, 'public'))); // ✅ correcte map
 
 // API routes
 app.post('/api/booking', (req, res) => {
-    // In a real app, we would save the booking to a database
     console.log('New booking request received:', req.body);
-    
-    // Generate a fake booking reference
     const bookingRef = 'TX' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-    
-    // Send back confirmation
     res.json({
         success: true,
         message: 'Booking confirmed successfully!',
@@ -30,11 +25,7 @@ app.post('/api/booking', (req, res) => {
 });
 
 app.post('/api/contact', (req, res) => {
-    // In a real app, we would save the contact form to a database
-    // and/or send an email notification
     console.log('New contact form submission received:', req.body);
-    
-    // Send back confirmation
     res.json({
         success: true,
         message: 'Contact form received successfully!',
@@ -42,19 +33,19 @@ app.post('/api/contact', (req, res) => {
     });
 });
 
-// Catch-all route to serve the frontend for any other routes
+// Catch root route
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'public/index.html')); // ✅ correcte map
 });
 
-// Handle all other routes
+// Catch all other routes
 app.get('/:page', (req, res) => {
     const page = req.params.page;
-    const filePath = path.join(__dirname, page.includes('.') ? page : `${page}.html`);
+    const filePath = path.join(__dirname, 'public', page.includes('.') ? page : `${page}.html`);
     
     res.sendFile(filePath, (err) => {
         if (err) {
-            res.status(404).sendFile(path.join(__dirname, 'index.html'));
+            res.status(404).sendFile(path.join(__dirname, 'public/index.html'));
         }
     });
 });
