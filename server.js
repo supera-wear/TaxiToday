@@ -10,7 +10,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public'))); // ✅ correcte map
+
+// 🔽 Dit zorgt dat je website en styling werkt
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 🔽 Dit zorgt dat je logo’s en afbeeldingen in uploads werken
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API routes
 app.post('/api/booking', (req, res) => {
@@ -33,12 +38,12 @@ app.post('/api/contact', (req, res) => {
     });
 });
 
-// Catch root route
+// Homepagina
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html')); // ✅ correcte map
+    res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-// Catch all other routes
+// Pagina-router (zoals /contact, /login, enz.)
 app.get('/:page', (req, res) => {
     const page = req.params.page;
     const filePath = path.join(__dirname, 'public', page.includes('.') ? page : `${page}.html`);
@@ -50,7 +55,7 @@ app.get('/:page', (req, res) => {
     });
 });
 
-// Start server
+// Server starten
 app.listen(PORT, () => {
     console.log(`TaxiToday server running on port ${PORT}`);
     console.log(`Visit http://localhost:${PORT} to view the website`);
