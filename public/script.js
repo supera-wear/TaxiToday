@@ -1,10 +1,6 @@
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('TaxiToday Website Loaded!');
-    <script>
-  window.onload = () => {
+   document.addEventListener('DOMContentLoaded', function() {
     window.scrollTo({ top: 0, behavior: 'auto' });
-  };
-</script>
+    console.log('TaxiToday Website Loaded!');
 
     // Mobile menu toggle
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
