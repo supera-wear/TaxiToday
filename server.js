@@ -15,11 +15,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 // API routes
 app.post('/api/booking', (req, res) => {
     console.log('New booking request received:', req.body);
-    const bookingRef = 'TX' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+
+    // Generate a simple booking identifier (e.g. "TX-000123")
+    const bookingId = 'TX-' + Math.floor(Math.random() * 1000000)
+        .toString()
+        .padStart(6, '0');
+
+    // For demo purposes, return an estimated pickup time 15 minutes from now
+    const estimatedPickup = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+
     res.json({
         success: true,
         message: 'Booking confirmed successfully!',
-        bookingRef: bookingRef,
+        bookingId,
+        estimatedPickup,
         data: req.body
     });
 });
