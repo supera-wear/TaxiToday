@@ -33,6 +33,26 @@ app.post('/api/contact', (req, res) => {
     });
 });
 
+// Fetch a user's bookings (dummy data for now)
+app.get('/api/user/bookings', (req, res) => {
+    // Normally you would look up the user's bookings in a database based on
+    // their authenticated user id. This example just returns a static list so
+    // the profile page can display something useful.
+    const demoBookings = [
+        {
+            bookingId: 'TX-123456',
+            pickup: 'Amsterdam Central Station',
+            destination: 'Schiphol Airport',
+            date: '2024-06-01',
+            time: '14:30',
+            price: 55,
+            status: 'confirmed'
+        }
+    ];
+
+    res.json({ success: true, bookings: demoBookings });
+});
+
 // Serve main index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
