@@ -551,36 +551,30 @@
                 vehicleType: document.querySelector('.booking-type-btn.active').getAttribute('data-vehicle')
             };
             
-            // Send booking to API
-            fetch('/api/bookings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
-                },
-                credentials: 'include',
-                body: JSON.stringify(formData)
+        const fare = calculateFare();
+
+        fetch('/api/create-checkout-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                total: fare ? fare.total : 0,
+                email: document.getElementById('booking-email').value
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Store booking info for confirmation page
-                    localStorage.setItem('lastBooking', JSON.stringify({
-                        ...formData,
-                        bookingId: data.bookingId,
-                        estimatedPickup: data.estimatedPickup
-                    }));
-                    
-                    // Redirect to confirmation page
-                    window.location.href = 'booking-confirmation.html';
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Booking error:', error);
-                alert('Error submitting booking. Please try again.');
-            });
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                alert('Error creating checkout session');
+            }
+        })
+        .catch(err => {
+            console.error('Checkout error:', err);
+            alert('Error submitting booking. Please try again.');
+        });
         });
     }
 
