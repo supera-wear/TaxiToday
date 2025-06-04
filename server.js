@@ -15,11 +15,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 // API routes
 app.post('/api/booking', (req, res) => {
     console.log('New booking request received:', req.body);
-    const bookingRef = 'TX' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+
+    // Generate a simple booking identifier (e.g. "TX-000123")
+    const bookingId = 'TX-' + Math.floor(Math.random() * 1000000)
+        .toString()
+        .padStart(6, '0');
+
+    // For demo purposes, return an estimated pickup time 15 minutes from now
+    const estimatedPickup = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+
     res.json({
         success: true,
         message: 'Booking confirmed successfully!',
-        bookingRef: bookingRef,
+        bookingId,
+        estimatedPickup,
         data: req.body
     });
 });
@@ -31,6 +40,26 @@ app.post('/api/contact', (req, res) => {
         message: 'Contact form received successfully!',
         data: req.body
     });
+});
+
+// Fetch a user's bookings (dummy data for now)
+app.get('/api/user/bookings', (req, res) => {
+    // Normally you would look up the user's bookings in a database based on
+    // their authenticated user id. This example just returns a static list so
+    // the profile page can display something useful.
+    const demoBookings = [
+        {
+            bookingId: 'TX-123456',
+            pickup: 'Amsterdam Central Station',
+            destination: 'Schiphol Airport',
+            date: '2024-06-01',
+            time: '14:30',
+            price: 55,
+            status: 'confirmed'
+        }
+    ];
+
+    res.json({ success: true, bookings: demoBookings });
 });
 
 // Serve main index.html

@@ -552,7 +552,7 @@
             };
             
             // Send booking to API
-            fetch('/api/bookings', {
+            fetch('/api/booking', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -570,9 +570,9 @@
                         bookingId: data.bookingId,
                         estimatedPickup: data.estimatedPickup
                     }));
-                    
-                    // Redirect to confirmation page
-                    window.location.href = 'booking-confirmation.html';
+
+                    // Redirect to confirmation page with booking reference
+                    window.location.href = `booking-confirmation.html?ref=${encodeURIComponent(data.bookingId)}`;
                 } else {
                     alert('Error: ' + data.message);
                 }
