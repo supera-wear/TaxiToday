@@ -552,7 +552,7 @@
             };
             
             // Send booking to API
-            fetch('/api/bookings', {
+            fetch('/api/booking', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
