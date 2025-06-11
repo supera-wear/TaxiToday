@@ -12,8 +12,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Stripe configuration (you'll need to add your actual Stripe secret key)
-const stripe = require('stripe')('sk_test_your_secret_key_here'); // Replace with your actual secret key
+// Stripe configuration - use environment variable for security
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'your_stripe_secret_key_here');
 
 // API routes
 app.post('/api/booking', (req, res) => {
