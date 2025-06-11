@@ -8,6 +8,9 @@ const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const { v4: uuidv4 } = require('uuid');
 
 // Load environment variables first
 require('dotenv').config();
@@ -17,6 +20,18 @@ const PORT = process.env.PORT || 10000;
 
 // In-memory user storage (in production, use a proper database)
 const users = [];
+const emailVerificationTokens = new Map();
+
+// Email transporter configuration
+const emailTransporter = nodemailer.createTransporter({
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: process.env.EMAIL_PORT || 587,
+    secure: false,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
 // Middleware
 app.use(cors({
@@ -53,6 +68,10 @@ passport.use(new LocalStrategy({
             return done(null, false, { message: 'Gebruiker niet gevonden' });
         }
 
+        if (!user.emailVerified) {
+            return done(null, false, { message: 'E-mailadres is nog niet geverifieerd. Controleer uw inbox.' });
+        }
+
         const isValidPassword = await bcrypt.compare(password, user.password);
         if (!isValidPassword) {
             return done(null, false, { message: 'Onjuist wachtwoord' });
@@ -71,10 +90,13 @@ passport.use(new GoogleStrategy({
     callbackURL: "/api/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
     try {
-        // Check if user already exists
+        console.log('Google OAuth callback received for:', profile.emails[0].value);
+        
+        // Check if user already exists with Google ID
         let user = users.find(u => u.googleId === profile.id);
         
         if (user) {
+            console.log('Existing Google user found:', user.email);
             return done(null, user);
         }
 
@@ -83,24 +105,30 @@ passport.use(new GoogleStrategy({
         
         if (user) {
             // Link Google account to existing user
+            console.log('Linking Google account to existing user:', user.email);
             user.googleId = profile.id;
+            user.emailVerified = true; // Google accounts are pre-verified
             return done(null, user);
         }
 
         // Create new user
+        console.log('Creating new Google user:', profile.emails[0].value);
         const newUser = {
-            id: users.length + 1,
+            id: uuidv4(),
             googleId: profile.id,
             name: profile.displayName,
             email: profile.emails[0].value,
-            avatar: profile.photos[0].value,
+            avatar: profile.photos[0]?.value,
             provider: 'google',
+            emailVerified: true, // Google accounts are pre-verified
             createdAt: new Date()
         };
 
         users.push(newUser);
+        console.log('New Google user created successfully');
         return done(null, newUser);
     } catch (error) {
+        console.error('Google OAuth error:', error);
         return done(error);
     }
 }));
@@ -143,6 +171,67 @@ const generateToken = (user) => {
     );
 };
 
+// Helper function to send verification email
+const sendVerificationEmail = async (user, token) => {
+    const verificationUrl = `${process.env.BASE_URL || 'http://localhost:10000'}/api/auth/verify-email?token=${token}`;
+    
+    const mailOptions = {
+        from: process.env.EMAIL_FROM || 'noreply@taxitoday.nl',
+        to: user.email,
+        subject: 'Bevestig uw e-mailadres - TaxiToday',
+        html: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <title>E-mail Verificatie - TaxiToday</title>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                    .content { background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px; }
+                    .button { display: inline-block; background: #ffd700; color: #1e3a8a; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }
+                    .footer { text-align: center; margin-top: 20px; color: #666; font-size: 14px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Welkom bij TaxiToday!</h1>
+                    </div>
+                    <div class="content">
+                        <h2>Hallo ${user.name},</h2>
+                        <p>Bedankt voor uw registratie bij TaxiToday. Om uw account te activeren, moet u uw e-mailadres bevestigen.</p>
+                        <p>Klik op de onderstaande knop om uw e-mailadres te verifiëren:</p>
+                        <p style="text-align: center;">
+                            <a href="${verificationUrl}" class="button">E-mailadres Bevestigen</a>
+                        </p>
+                        <p>Als de knop niet werkt, kunt u ook deze link kopiëren en in uw browser plakken:</p>
+                        <p style="word-break: break-all; background: #e2e8f0; padding: 10px; border-radius: 5px;">${verificationUrl}</p>
+                        <p>Deze verificatielink is 24 uur geldig.</p>
+                        <p>Als u dit account niet heeft aangemaakt, kunt u deze e-mail negeren.</p>
+                        <p>Met vriendelijke groet,<br>Het TaxiToday Team</p>
+                    </div>
+                    <div class="footer">
+                        <p>© 2024 TaxiToday. Alle rechten voorbehouden.</p>
+                        <p>Voor vragen kunt u contact opnemen via info@taxitoday.nl</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `
+    };
+
+    try {
+        await emailTransporter.sendMail(mailOptions);
+        console.log('Verification email sent to:', user.email);
+        return true;
+    } catch (error) {
+        console.error('Error sending verification email:', error);
+        return false;
+    }
+};
+
 // Authentication middleware
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -161,16 +250,62 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+// Check if user is already logged in middleware
+const checkIfLoggedIn = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (token) {
+        jwt.verify(token, process.env.JWT_SECRET || 'taxitoday-jwt-secret', (err, user) => {
+            if (!err && user) {
+                return res.status(200).json({
+                    success: true,
+                    message: 'Gebruiker is al ingelogd',
+                    alreadyLoggedIn: true,
+                    user: user
+                });
+            }
+            next();
+        });
+    } else {
+        next();
+    }
+};
+
 // Auth routes
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/auth/register', checkIfLoggedIn, async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, acceptTerms } = req.body;
 
         // Validate input
         if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
                 message: 'Alle velden zijn verplicht'
+            });
+        }
+
+        if (!acceptTerms) {
+            return res.status(400).json({
+                success: false,
+                message: 'U moet de algemene voorwaarden accepteren'
+            });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Ongeldig e-mailadres'
+            });
+        }
+
+        // Validate password strength
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Wachtwoord moet minimaal 6 karakters lang zijn'
             });
         }
 
@@ -186,30 +321,44 @@ app.post('/api/auth/register', async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 12);
 
+        // Generate verification token
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+
         // Create new user
         const newUser = {
-            id: users.length + 1,
+            id: uuidv4(),
             name,
             email,
             password: hashedPassword,
             provider: 'local',
+            emailVerified: false,
             createdAt: new Date()
         };
 
         users.push(newUser);
 
-        // Generate token
-        const token = generateToken(newUser);
+        // Store verification token
+        emailVerificationTokens.set(verificationToken, {
+            userId: newUser.id,
+            email: newUser.email,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+        });
 
-        // Remove password from response
-        const userResponse = { ...newUser };
-        delete userResponse.password;
+        // Send verification email
+        const emailSent = await sendVerificationEmail(newUser, verificationToken);
+
+        if (!emailSent) {
+            return res.status(500).json({
+                success: false,
+                message: 'Account aangemaakt, maar verificatie-email kon niet worden verzonden. Probeer later opnieuw in te loggen.'
+            });
+        }
 
         res.json({
             success: true,
-            message: 'Account succesvol aangemaakt',
-            token,
-            user: userResponse
+            message: 'Account succesvol aangemaakt! Controleer uw e-mail voor de verificatielink.',
+            emailSent: true,
+            email: email
         });
     } catch (error) {
         console.error('Registration error:', error);
@@ -220,27 +369,80 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-app.post('/api/auth/login', passport.authenticate('local'), (req, res) => {
+// Email verification endpoint
+app.get('/api/auth/verify-email', async (req, res) => {
     try {
-        const token = generateToken(req.user);
-        
-        // Remove password from response
-        const userResponse = { ...req.user };
-        delete userResponse.password;
+        const { token } = req.query;
 
-        res.json({
-            success: true,
-            message: 'Succesvol ingelogd',
-            token,
-            user: userResponse
-        });
+        if (!token) {
+            return res.redirect('/login.html?error=invalid_token');
+        }
+
+        const tokenData = emailVerificationTokens.get(token);
+        if (!tokenData) {
+            return res.redirect('/login.html?error=invalid_token');
+        }
+
+        if (new Date() > tokenData.expiresAt) {
+            emailVerificationTokens.delete(token);
+            return res.redirect('/login.html?error=token_expired');
+        }
+
+        // Find and verify user
+        const user = users.find(u => u.id === tokenData.userId);
+        if (!user) {
+            return res.redirect('/login.html?error=user_not_found');
+        }
+
+        user.emailVerified = true;
+        emailVerificationTokens.delete(token);
+
+        // Redirect to login with success message
+        res.redirect('/login.html?verified=true');
     } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Er is een fout opgetreden bij het inloggen'
-        });
+        console.error('Email verification error:', error);
+        res.redirect('/login.html?error=verification_failed');
     }
+});
+
+app.post('/api/auth/login', checkIfLoggedIn, (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (err) {
+            return res.status(500).json({
+                success: false,
+                message: 'Er is een fout opgetreden bij het inloggen'
+            });
+        }
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: info.message || 'Ongeldige inloggegevens'
+            });
+        }
+
+        req.logIn(user, (err) => {
+            if (err) {
+                return res.status(500).json({
+                    success: false,
+                    message: 'Er is een fout opgetreden bij het inloggen'
+                });
+            }
+
+            const token = generateToken(user);
+            
+            // Remove password from response
+            const userResponse = { ...user };
+            delete userResponse.password;
+
+            res.json({
+                success: true,
+                message: 'Succesvol ingelogd',
+                token,
+                user: userResponse
+            });
+        });
+    })(req, res, next);
 });
 
 // Google OAuth routes
@@ -252,6 +454,7 @@ app.get('/api/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/login.html?error=google_auth_failed' }),
     (req, res) => {
         try {
+            console.log('Google OAuth callback successful for user:', req.user.email);
             const token = generateToken(req.user);
             
             // Set token in cookie for frontend
@@ -262,7 +465,7 @@ app.get('/api/auth/google/callback',
             });
 
             // Redirect to profile or home page
-            res.redirect('/profile.html');
+            res.redirect('/profile.html?login=success');
         } catch (error) {
             console.error('Google auth callback error:', error);
             res.redirect('/login.html?error=auth_failed');
@@ -285,6 +488,57 @@ app.post('/api/auth/logout', (req, res) => {
             message: 'Succesvol uitgelogd'
         });
     });
+});
+
+// Resend verification email
+app.post('/api/auth/resend-verification', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = users.find(u => u.email === email);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Gebruiker niet gevonden'
+            });
+        }
+
+        if (user.emailVerified) {
+            return res.status(400).json({
+                success: false,
+                message: 'E-mailadres is al geverifieerd'
+            });
+        }
+
+        // Generate new verification token
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        
+        emailVerificationTokens.set(verificationToken, {
+            userId: user.id,
+            email: user.email,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        });
+
+        const emailSent = await sendVerificationEmail(user, verificationToken);
+
+        if (!emailSent) {
+            return res.status(500).json({
+                success: false,
+                message: 'Verificatie-email kon niet worden verzonden'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Nieuwe verificatie-email verzonden'
+        });
+    } catch (error) {
+        console.error('Resend verification error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Er is een fout opgetreden'
+        });
+    }
 });
 
 // Protected user routes
@@ -583,4 +837,5 @@ app.listen(PORT, () => {
     console.log(`TaxiToday server running on port ${PORT}`);
     console.log(`Stripe integration enabled with key: ${process.env.STRIPE_SECRET_KEY ? 'sk_test_***' : 'NOT SET'}`);
     console.log(`Google OAuth enabled: ${process.env.GOOGLE_CLIENT_ID ? 'YES' : 'NO'}`);
+    console.log(`Email service configured: ${process.env.EMAIL_USER ? 'YES' : 'NO'}`);
 });
