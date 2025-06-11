@@ -1,4 +1,4 @@
-   document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     window.scrollTo({ top: 0, behavior: 'auto' });
     console.log('TaxiToday Website Loaded!');
 
@@ -465,12 +465,25 @@
             
             // Validate email and phone
             if (email && phone) {
-                // Update the price calculation based on the actual distance
-                updatePriceSummary();
+                // Gather all booking data
+                const bookingData = {
+                    pickup: document.getElementById('pickup').value,
+                    destination: document.getElementById('destination').value,
+                    date: document.getElementById('date').value,
+                    time: document.getElementById('time').value,
+                    passengers: document.getElementById('passengers').value,
+                    luggage: document.getElementById('luggage').value,
+                    vehicleType: document.querySelector('.booking-type-btn.active').getAttribute('data-vehicle'),
+                    email: email,
+                    phone: phone,
+                    distance: distanceInKm
+                };
                 
-                // Show price summary and book button
-                priceSummary.classList.remove('hidden');
-                bookBtn.classList.remove('hidden');
+                // Store booking data for price details page
+                localStorage.setItem('priceCalculation', JSON.stringify(bookingData));
+                
+                // Redirect to price details page
+                window.location.href = 'price-details.html';
             } else {
                 alert('Vul alstublieft zowel e-mailadres als telefoonnummer in.');
             }

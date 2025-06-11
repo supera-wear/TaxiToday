@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prijsdetails - TaxiToday.nl</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-sans antialiased text-gray-800 bg-gray-100">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="index.html" class="text-2xl font-bold text-blue-600 flex items-center">
+                    <img src="TaxiToday_Logo_Blue.png" alt="TaxiToday" class="h-10 mr-2">
+                </a>
+                <span class="ml-2 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">NL</span>
+            </div>
+            
+            <nav class="hidden md:flex space-x-8">
+                <a href="index.html#pricing" class="nav-link font-medium hover:text-blue-600">Prijzen</a>
+                <a href="index.html#service" class="nav-link font-medium hover:text-blue-600">Service</a>
+                <a href="over-ons.html" class="nav-link font-medium hover:text-blue-600">Over ons</a>
+                <a href="contact.html" class="nav-link font-medium hover:text-blue-600">Contact</a>
+                <!-- Auth buttons - will be toggled by JavaScript based on auth status -->
+                <a href="login.html" class="nav-link font-medium hover:text-blue-600 login-btn">Login</a>
+                <a href="profile.html" class="nav-link font-medium text-blue-600 profile-btn hidden">
+                    <i class="fas fa-user-circle mr-1"></i> Mijn Profiel
+                </a>
+                <button class="nav-link font-medium hover:text-red-600 logout-btn hidden">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Uitloggen
+                </button>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <a href="tel:+31202613210" class="hidden md:flex items-center text-blue-600 font-medium">
+                    <i class="fas fa-phone-alt mr-2"></i>
+                    020 261 32 10
+                </a>
+                <button class="md:hidden text-gray-600" id="mobileMenuBtn">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white py-2 px-4 shadow-lg">
+            <a href="index.html#pricing" class="block py-2 hover:text-blue-600">Prijzen</a>
+            <a href="index.html#service" class="block py-2 hover:text-blue-600">Service</a>
+            <a href="over-ons.html" class="block py-2 hover:text-blue-600">Over ons</a>
+            <a href="contact.html" class="block py-2 hover:text-blue-600">Contact</a>
+            <!-- Auth links - will be toggled by JavaScript based on auth status -->
+            <a href="login.html" class="block py-2 hover:text-blue-600 login-btn">Login</a>
+            <a href="profile.html" class="block py-2 text-blue-600 profile-btn hidden">
+                <i class="fas fa-user-circle mr-1"></i> Mijn Profiel
+            </a>
+            <button class="block py-2 hover:text-red-600 w-full text-left logout-btn hidden">
+                <i class="fas fa-sign-out-alt mr-1"></i> Uitloggen
+            </button>
+            <a href="tel:+31202613210" class="block py-2 text-blue-600 font-medium">
+                <i class="fas fa-phone-alt mr-2"></i>
+                020 261 32 10
+            </a>
+        </div>
+    </header>
+
+    <!-- Price Details Section -->
+    <section class="py-16 md:py-24">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 md:p-8">
+                    <div class="text-center mb-8">
+                        <div class="inline-block p-4 bg-blue-100 rounded-full text-blue-600 text-4xl mb-4">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <h1 class="text-3xl md:text-4xl font-bold mb-2">Prijsberekening</h1>
+                        <p class="text-gray-600">Hier zijn de details van uw taxirit</p>
+                    </div>
+                    
+                    <div class="border-2 border-dashed border-gray-200 rounded-lg p-6 mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold">Ritdetails</h2>
+                            <span id="priceReference" class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-medium">PRIJS: CALC001</span>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-sm text-gray-600 mb-1">Ophaaladres</h3>
+                                <p id="pickupAddress" class="font-medium">Centraal Station, Amsterdam</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm text-gray-600 mb-1">Bestemmingsadres</h3>
+                                <p id="destinationAddress" class="font-medium">Schiphol Airport, Haarlemmermeer</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm text-gray-600 mb-1">Datum & Tijd</h3>
+                                <p id="dateTime" class="font-medium">30-05-2024 om 14:30</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm text-gray-600 mb-1">Passagiers</h3>
+                                <p id="passengers" class="font-medium">2 personen</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm text-gray-600 mb-1">Voertuigtype</h3>
+                                <p id="vehicleType" class="font-medium">Standaard Taxi</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm text-gray-600 mb-1">Geschatte afstand</h3>
+                                <p id="distance" class="font-medium">22.5 km</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Price Breakdown -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                        <h2 class="text-lg font-bold mb-4 text-blue-800">Prijsopbouw</h2>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">Instaptarief</span>
+                                <span id="baseFare" class="font-medium">€2,95</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">Rijtarief (<span id="distanceKm">22.5</span> km × €2,50)</span>
+                                <span id="distanceFare" class="font-medium">€56,25</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">Servicekosten</span>
+                                <span id="serviceFee" class="font-medium">€5,00</span>
+                            </div>
+                            <div class="border-t border-blue-200 pt-3 flex justify-between items-center">
+                                <span class="text-gray-700">Subtotaal</span>
+                                <span id="subtotal" class="font-medium">€64,20</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">BTW (9%)</span>
+                                <span id="vat" class="font-medium">€5,78</span>
+                            </div>
+                            <div class="border-t-2 border-blue-300 pt-3 flex justify-between items-center font-bold text-lg">
+                                <span class="text-blue-800">Totaalprijs (incl. BTW)</span>
+                                <span id="totalPrice" class="text-blue-600 text-2xl">€65,25</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Information Form -->
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+                        <h2 class="text-lg font-bold mb-4">Uw contactgegevens</h2>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="customerEmail" class="block text-sm font-medium text-gray-700 mb-1">E-mailadres</label>
+                                <input type="email" id="customerEmail" class="w-full py-2 px-3 border border-gray-300 rounded-lg" value="ramazan.barlas@gmail.com" readonly>
+                            </div>
+                            <div>
+                                <label for="customerPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefoonnummer</label>
+                                <input type="tel" id="customerPhone" class="w-full py-2 px-3 border border-gray-300 rounded-lg" value="0634190777" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                        <button id="bookNowBtn" class="btn-primary w-full md:flex-1">
+                            <i class="fas fa-check-circle mr-2"></i> Bevestig Boeking
+                        </button>
+                        <button id="modifyBtn" class="btn-secondary w-full md:flex-1 bg-gray-600 hover:bg-gray-700 text-white">
+                            <i class="fas fa-edit mr-2"></i> Wijzig Details
+                        </button>
+                        <a href="index.html" class="btn-secondary w-full md:flex-1 bg-red-600 hover:bg-red-700 text-white text-center">
+                            <i class="fas fa-times mr-2"></i> Annuleren
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ElevenLabs Convai Agent -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <elevenlabs-convai agent-id="agent_01jvfmapr8e6f8mn92sex8797s"></elevenlabs-convai>
+        <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="md:flex md:justify-between">
+                <div class="mb-6 md:mb-0">
+                    <a href="index.html" class="text-2xl font-bold text-white flex items-center">
+                        <img src="TaxiToday_Logo_white.png" alt="TaxiToday" class="h-10 mr-2">
+                    </a>
+                    <p class="mt-2 text-gray-400">Professionele taxiservice in heel Nederland.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-8 sm:grid-cols-3">
+                    <div>
+                        <h3 class="font-bold mb-3">Links</h3>
+                        <ul class="space-y-2">
+                            <li><a href="index.html#booking" class="text-gray-400 hover:text-white">Boek een taxi</a></li>
+                            <li><a href="index.html#pricing" class="text-gray-400 hover:text-white">Prijzen</a></li>
+                            <li><a href="over-ons.html" class="text-gray-400 hover:text-white">Over ons</a></li>
+                            <li><a href="contact.html" class="text-gray-400 hover:text-white">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-3">Contact</h3>
+                        <ul class="space-y-2">
+                            <li class="text-gray-400">020 261 32 10</li>
+                            <li class="text-gray-400">info@taxitoday.nl</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-gray-700 md:flex md:justify-between">
+                <p class="text-gray-400 text-sm">© 2024 TaxiToday. Alle rechten voorbehouden.</p>
+                <div class="flex mt-4 md:mt-0 space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get booking data from URL parameters or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Load booking data from localStorage if available
+            const bookingData = JSON.parse(localStorage.getItem('priceCalculation') || '{}');
+            
+            // Fill in the details if data is available
+            if (bookingData.pickup) {
+                document.getElementById('pickupAddress').textContent = bookingData.pickup;
+            }
+            if (bookingData.destination) {
+                document.getElementById('destinationAddress').textContent = bookingData.destination;
+            }
+            if (bookingData.date && bookingData.time) {
+                document.getElementById('dateTime').textContent = `${bookingData.date} om ${bookingData.time}`;
+            }
+            if (bookingData.passengers) {
+                document.getElementById('passengers').textContent = bookingData.passengers + ' personen';
+            }
+            if (bookingData.vehicleType) {
+                const vehicleTypes = {
+                    'standard': 'Standaard Taxi',
+                    'comfort': 'Comfort Taxi',
+                    'van': 'Van Taxi'
+                };
+                document.getElementById('vehicleType').textContent = vehicleTypes[bookingData.vehicleType] || 'Standaard Taxi';
+            }
+            if (bookingData.email) {
+                document.getElementById('customerEmail').value = bookingData.email;
+            }
+            if (bookingData.phone) {
+                document.getElementById('customerPhone').value = bookingData.phone;
+            }
+            
+            // Calculate and display price breakdown
+            const distance = bookingData.distance || 22.5;
+            const baseFare = 2.95;
+            const pricePerKm = 2.50;
+            const serviceFee = 5.00;
+            
+            const distanceFare = distance * pricePerKm;
+            const subtotal = baseFare + distanceFare + serviceFee;
+            const vat = subtotal * 0.09;
+            const total = subtotal + vat;
+            
+            // Update display
+            document.getElementById('distance').textContent = distance.toFixed(1) + ' km';
+            document.getElementById('distanceKm').textContent = distance.toFixed(1);
+            document.getElementById('baseFare').textContent = '€' + baseFare.toFixed(2);
+            document.getElementById('distanceFare').textContent = '€' + distanceFare.toFixed(2);
+            document.getElementById('serviceFee').textContent = '€' + serviceFee.toFixed(2);
+            document.getElementById('subtotal').textContent = '€' + subtotal.toFixed(2);
+            document.getElementById('vat').textContent = '€' + vat.toFixed(2);
+            document.getElementById('totalPrice').textContent = '€' + total.toFixed(2);
+            
+            // Book now button functionality
+            document.getElementById('bookNowBtn').addEventListener('click', function() {
+                // Store final booking data
+                const finalBookingData = {
+                    ...bookingData,
+                    totalPrice: total.toFixed(2),
+                    bookingId: 'TX' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0')
+                };
+                
+                localStorage.setItem('lastBooking', JSON.stringify(finalBookingData));
+                
+                // Redirect to booking confirmation
+                window.location.href = 'booking-confirmation.html';
+            });
+            
+            // Modify button functionality
+            document.getElementById('modifyBtn').addEventListener('click', function() {
+                // Go back to booking form with current data
+                window.location.href = 'index.html#booking';
+            });
+            
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+    
+    <script src="login.js"></script>
+</body>
+</html>
