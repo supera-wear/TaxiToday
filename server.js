@@ -23,7 +23,7 @@ const users = [];
 const emailVerificationTokens = new Map();
 
 // Email transporter configuration
-const emailTransporter = nodemailer.createTransport({
+const emailTransporter = nodemailer.createTransporter({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
     port: process.env.EMAIL_PORT || 587,
     secure: false,
@@ -937,6 +937,35 @@ app.get('/:page', (req, res) => {
             res.status(404).sendFile(path.join(__dirname, 'public/index.html'));
         }
     });
+});
+
+// Global error handling middleware - MUST be placed after all routes
+app.use((err, req, res, next) => {
+    console.error('Unhandled error:', err);
+    
+    // Always send JSON response for API routes
+    if (req.path.startsWith('/api/')) {
+        return res.status(500).json({
+            success: false,
+            message: 'Er is een interne serverfout opgetreden',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+    
+    // For non-API routes, send HTML error page
+    res.status(500).sendFile(path.join(__dirname, 'public/index.html'));
+});
+
+// Handle 404 errors
+app.use((req, res) => {
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({
+            success: false,
+            message: 'API endpoint niet gevonden'
+        });
+    }
+    
+    res.status(404).sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // Start server
