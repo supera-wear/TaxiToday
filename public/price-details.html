@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body class="font-sans antialiased text-gray-800 bg-gray-100">
     <!-- Header -->
@@ -163,11 +164,50 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Payment Section -->
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+                        <h2 class="text-lg font-bold mb-4 text-yellow-800">
+                            <i class="fas fa-credit-card mr-2"></i>Betaling vereist
+                        </h2>
+                        <p class="text-yellow-700 mb-4">Om uw boeking te bevestigen, dient u eerst te betalen via onze beveiligde betalingsomgeving.</p>
+                        
+                        <!-- Payment Method Selection -->
+                        <div class="mb-4">
+                            <h3 class="font-medium mb-2">Kies uw betaalmethode:</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div class="payment-method-btn active" data-method="card">
+                                    <i class="fas fa-credit-card text-xl mb-1"></i>
+                                    <span class="text-sm">Creditcard</span>
+                                </div>
+                                <div class="payment-method-btn" data-method="ideal">
+                                    <i class="fas fa-university text-xl mb-1"></i>
+                                    <span class="text-sm">iDEAL</span>
+                                </div>
+                                <div class="payment-method-btn" data-method="paypal">
+                                    <i class="fab fa-paypal text-xl mb-1"></i>
+                                    <span class="text-sm">PayPal</span>
+                                </div>
+                                <div class="payment-method-btn" data-method="bancontact">
+                                    <i class="fas fa-credit-card text-xl mb-1"></i>
+                                    <span class="text-sm">Bancontact</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stripe Elements Container -->
+                        <div id="payment-element" class="mb-4 p-4 border border-gray-300 rounded-lg bg-white hidden">
+                            <!-- Stripe Elements will be inserted here -->
+                        </div>
+
+                        <!-- Payment Error Display -->
+                        <div id="payment-errors" class="hidden mb-4 p-3 bg-red-100 text-red-700 rounded-lg"></div>
+                    </div>
                     
                     <!-- Action Buttons -->
                     <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-                        <button id="bookNowBtn" class="btn-primary w-full md:flex-1">
-                            <i class="fas fa-check-circle mr-2"></i> Bevestig Boeking
+                        <button id="payAndBookBtn" class="btn-primary w-full md:flex-1">
+                            <i class="fas fa-lock mr-2"></i> Betaal & Bevestig Boeking
                         </button>
                         <button id="modifyBtn" class="btn-secondary w-full md:flex-1 bg-gray-600 hover:bg-gray-700 text-white">
                             <i class="fas fa-edit mr-2"></i> Wijzig Details
@@ -234,6 +274,12 @@
     </footer>
 
     <script>
+        // Stripe configuration
+        const stripe = Stripe('pk_test_your_publishable_key_here'); // Replace with your actual publishable key
+        let elements;
+        let paymentElement;
+        let selectedPaymentMethod = 'card';
+
         document.addEventListener('DOMContentLoaded', function() {
             // Get booking data from URL parameters or localStorage
             const urlParams = new URLSearchParams(window.location.search);
@@ -289,20 +335,31 @@
             document.getElementById('subtotal').textContent = '€' + subtotal.toFixed(2);
             document.getElementById('vat').textContent = '€' + vat.toFixed(2);
             document.getElementById('totalPrice').textContent = '€' + total.toFixed(2);
-            
-            // Book now button functionality
-            document.getElementById('bookNowBtn').addEventListener('click', function() {
-                // Store final booking data
-                const finalBookingData = {
-                    ...bookingData,
-                    totalPrice: total.toFixed(2),
-                    bookingId: 'TX' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0')
-                };
-                
-                localStorage.setItem('lastBooking', JSON.stringify(finalBookingData));
-                
-                // Redirect to booking confirmation
-                window.location.href = 'booking-confirmation.html';
+
+            // Initialize Stripe Elements
+            initializeStripeElements(total);
+
+            // Payment method selection
+            const paymentMethodBtns = document.querySelectorAll('.payment-method-btn');
+            paymentMethodBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    paymentMethodBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedPaymentMethod = this.getAttribute('data-method');
+                    
+                    // Show/hide payment element based on method
+                    const paymentElementDiv = document.getElementById('payment-element');
+                    if (selectedPaymentMethod === 'card') {
+                        paymentElementDiv.classList.remove('hidden');
+                    } else {
+                        paymentElementDiv.classList.add('hidden');
+                    }
+                });
+            });
+
+            // Pay and book button functionality
+            document.getElementById('payAndBookBtn').addEventListener('click', function() {
+                handlePayment(total, bookingData);
             });
             
             // Modify button functionality
@@ -321,8 +378,203 @@
                 });
             }
         });
+
+        // Initialize Stripe Elements
+        async function initializeStripeElements(amount) {
+            try {
+                // Create payment intent on your server
+                const response = await fetch('/api/create-payment-intent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: Math.round(amount * 100), // Convert to cents
+                        currency: 'eur',
+                        metadata: {
+                            booking_type: 'taxi_ride',
+                            customer_email: document.getElementById('customerEmail').value,
+                            customer_phone: document.getElementById('customerPhone').value
+                        }
+                    }),
+                });
+
+                const { client_secret } = await response.json();
+
+                // Initialize Elements
+                elements = stripe.elements({
+                    clientSecret: client_secret,
+                    appearance: {
+                        theme: 'stripe',
+                        variables: {
+                            colorPrimary: '#3b82f6',
+                            colorBackground: '#ffffff',
+                            colorText: '#374151',
+                            colorDanger: '#ef4444',
+                            fontFamily: 'Roboto, Arial, sans-serif',
+                            spacingUnit: '4px',
+                            borderRadius: '8px',
+                        }
+                    }
+                });
+
+                // Create and mount the Payment Element
+                paymentElement = elements.create('payment');
+                paymentElement.mount('#payment-element');
+
+                // Show payment element by default for card payments
+                document.getElementById('payment-element').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error initializing Stripe:', error);
+                showPaymentError('Er is een fout opgetreden bij het initialiseren van de betaling. Probeer het opnieuw.');
+            }
+        }
+
+        // Handle payment submission
+        async function handlePayment(amount, bookingData) {
+            const payBtn = document.getElementById('payAndBookBtn');
+            const originalText = payBtn.innerHTML;
+            
+            // Show loading state
+            payBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Betaling verwerken...';
+            payBtn.disabled = true;
+
+            try {
+                if (selectedPaymentMethod === 'card') {
+                    // Handle card payment with Stripe Elements
+                    const { error, paymentIntent } = await stripe.confirmPayment({
+                        elements,
+                        confirmParams: {
+                            return_url: window.location.origin + '/booking-confirmation.html',
+                            payment_method_data: {
+                                billing_details: {
+                                    email: document.getElementById('customerEmail').value,
+                                    phone: document.getElementById('customerPhone').value,
+                                }
+                            }
+                        },
+                        redirect: 'if_required'
+                    });
+
+                    if (error) {
+                        showPaymentError(error.message);
+                        payBtn.innerHTML = originalText;
+                        payBtn.disabled = false;
+                    } else if (paymentIntent.status === 'succeeded') {
+                        // Payment successful, create booking
+                        await createBookingAfterPayment(bookingData, paymentIntent.id);
+                    }
+                } else {
+                    // Handle other payment methods (iDEAL, PayPal, etc.)
+                    await handleAlternativePayment(selectedPaymentMethod, amount, bookingData);
+                }
+            } catch (error) {
+                console.error('Payment error:', error);
+                showPaymentError('Er is een fout opgetreden tijdens de betaling. Probeer het opnieuw.');
+                payBtn.innerHTML = originalText;
+                payBtn.disabled = false;
+            }
+        }
+
+        // Handle alternative payment methods
+        async function handleAlternativePayment(method, amount, bookingData) {
+            try {
+                const response = await fetch('/api/create-payment-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        payment_method: method,
+                        amount: Math.round(amount * 100),
+                        currency: 'eur',
+                        booking_data: bookingData,
+                        success_url: window.location.origin + '/booking-confirmation.html',
+                        cancel_url: window.location.href
+                    }),
+                });
+
+                const { url } = await response.json();
+                
+                // Redirect to payment provider
+                window.location.href = url;
+            } catch (error) {
+                console.error('Alternative payment error:', error);
+                showPaymentError('Er is een fout opgetreden bij het verwerken van uw betaling.');
+            }
+        }
+
+        // Create booking after successful payment
+        async function createBookingAfterPayment(bookingData, paymentIntentId) {
+            try {
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        ...bookingData,
+                        payment_intent_id: paymentIntentId,
+                        payment_status: 'paid'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Store booking info for confirmation page
+                    localStorage.setItem('lastBooking', JSON.stringify({
+                        ...bookingData,
+                        bookingId: result.bookingId,
+                        paymentIntentId: paymentIntentId,
+                        totalPrice: document.getElementById('totalPrice').textContent
+                    }));
+                    
+                    // Redirect to confirmation page
+                    window.location.href = 'booking-confirmation.html?ref=' + result.bookingId;
+                } else {
+                    showPaymentError('Betaling geslaagd, maar er is een fout opgetreden bij het maken van de boeking. Neem contact op met de klantenservice.');
+                }
+            } catch (error) {
+                console.error('Booking creation error:', error);
+                showPaymentError('Betaling geslaagd, maar er is een fout opgetreden bij het maken van de boeking. Neem contact op met de klantenservice.');
+            }
+        }
+
+        // Show payment error
+        function showPaymentError(message) {
+            const errorDiv = document.getElementById('payment-errors');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            
+            // Hide error after 10 seconds
+            setTimeout(() => {
+                errorDiv.classList.add('hidden');
+            }, 10000);
+        }
     </script>
     
     <script src="login.js"></script>
+
+    <style>
+        .payment-method-btn {
+            @apply flex flex-col items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer transition-all duration-200 hover:border-blue-300 hover:bg-blue-50;
+        }
+        
+        .payment-method-btn.active {
+            @apply border-blue-500 bg-blue-50 text-blue-700;
+        }
+        
+        .payment-method-btn i {
+            @apply text-gray-600;
+        }
+        
+        .payment-method-btn.active i {
+            @apply text-blue-600;
+        }
+    </style>
 </body>
 </html>
