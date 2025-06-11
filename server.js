@@ -33,6 +33,39 @@ app.post('/api/contact', (req, res) => {
     });
 });
 
+// Stripe checkout proxy endpoint
+app.post('/api/stripe/checkout', async (req, res) => {
+    try {
+        const { price_id, mode, success_url, cancel_url } = req.body;
+        const authHeader = req.headers.authorization;
+        
+        if (!authHeader) {
+            return res.status(401).json({ error: 'Authorization header required' });
+        }
+        
+        // In a real implementation, you would validate the token here
+        // For now, we'll simulate a successful response
+        const sessionId = 'cs_test_' + Math.random().toString(36).substring(2, 15);
+        const checkoutUrl = `https://checkout.stripe.com/pay/${sessionId}`;
+        
+        console.log('Stripe checkout session created:', {
+            sessionId,
+            price_id,
+            mode,
+            success_url,
+            cancel_url
+        });
+        
+        res.json({
+            sessionId: sessionId,
+            url: checkoutUrl
+        });
+    } catch (error) {
+        console.error('Stripe checkout error:', error);
+        res.status(500).json({ error: 'Failed to create checkout session' });
+    }
+});
+
 // Serve main index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
