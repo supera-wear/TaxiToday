@@ -206,7 +206,7 @@
                     
                     <!-- Action Buttons -->
                     <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-                        <button id="payAndBookBtn" class="btn-primary w-full md:flex-1">
+                        <button id="payAndBookBtn" class="btn-primary w-full md:flex-1" disabled>
                             <i class="fas fa-lock mr-2"></i> Betaal & Bevestig Boeking
                         </button>
                         <button id="modifyBtn" class="btn-secondary w-full md:flex-1 bg-gray-600 hover:bg-gray-700 text-white">
@@ -274,8 +274,8 @@
     </footer>
 
     <script>
-        // Stripe configuration
-        const stripe = Stripe('pk_test_your_publishable_key_here'); // Replace with your actual publishable key
+        // Stripe configuration with your publishable key
+        const stripe = Stripe('pk_test_51RJKhEFbnCEGqxgm89iOuJ1fK8K1Z19PkCUIxWilVgwNDYAdW1b5rAT3KIjcHKnTEY0PYd5LzurziI26j4zDHhbB00omnLTRBg');
         let elements;
         let paymentElement;
         let selectedPaymentMethod = 'card';
@@ -424,6 +424,11 @@
 
                 // Show payment element by default for card payments
                 document.getElementById('payment-element').classList.remove('hidden');
+
+                // Enable the payment button after Stripe Elements are fully initialized
+                const payBtn = document.getElementById('payAndBookBtn');
+                payBtn.disabled = false;
+                payBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 
             } catch (error) {
                 console.error('Error initializing Stripe:', error);
@@ -574,6 +579,11 @@
         
         .payment-method-btn.active i {
             @apply text-blue-600;
+        }
+
+        /* Disabled button styling */
+        button:disabled {
+            @apply opacity-50 cursor-not-allowed;
         }
     </style>
 </body>
