@@ -23,7 +23,7 @@ const users = [];
 const emailVerificationTokens = new Map();
 
 // Email transporter configuration
-const emailTransporter = nodemailer.createTransport({
+const emailTransporter = nodemailer.createTransporter({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
     port: process.env.EMAIL_PORT || 587,
     secure: false,
@@ -157,6 +157,46 @@ try {
     console.error('Failed to initialize Stripe:', error.message);
     process.exit(1);
 }
+
+// Pricing configuration
+const PRICING_CONFIG = {
+    standard: {
+        baseFare: 2.95,
+        pricePerKm: 2.50,
+        name: 'Standaard Taxi'
+    },
+    comfort: {
+        baseFare: 4.50,
+        pricePerKm: 3.25,
+        name: 'Comfort Taxi'
+    },
+    van: {
+        baseFare: 5.95,
+        pricePerKm: 3.95,
+        name: 'Van Taxi'
+    }
+};
+
+// Helper function to calculate fare
+const calculateFare = (distanceKm, vehicleType = 'standard') => {
+    const config = PRICING_CONFIG[vehicleType] || PRICING_CONFIG.standard;
+    const rideFare = config.baseFare + (distanceKm * config.pricePerKm);
+    const serviceFee = 5.00;
+    const subtotal = rideFare + serviceFee;
+    const vat = subtotal * 0.09; // 9% VAT
+    const total = subtotal + vat;
+    
+    return {
+        baseFare: config.baseFare,
+        pricePerKm: config.pricePerKm,
+        rideFare: rideFare,
+        serviceFee: serviceFee,
+        subtotal: subtotal,
+        vat: vat,
+        total: total,
+        vehicleName: config.name
+    };
+};
 
 // Helper function to generate JWT token
 const generateToken = (user) => {
@@ -589,6 +629,213 @@ app.get('/api/user/bookings', authenticateToken, (req, res) => {
     });
 });
 
+// Calculate fare endpoint
+app.post('/api/calculate-fare', (req, res) => {
+    try {
+        const { distanceKm, vehicleType = 'standard' } = req.body;
+
+        if (!distanceKm || distanceKm <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Geldige afstand is vereist'
+            });
+        }
+
+        const fareCalculation = calculateFare(distanceKm, vehicleType);
+
+        res.json({
+            success: true,
+            fare: fareCalculation,
+            distance: distanceKm,
+            vehicleType: vehicleType
+        });
+    } catch (error) {
+        console.error('Fare calculation error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Fout bij berekenen van de prijs'
+        });
+    }
+});
+
+// Create Stripe Checkout Session for dynamic pricing
+app.post('/api/create-checkout-session', async (req, res) => {
+    try {
+        const { 
+            pickup, 
+            destination, 
+            distanceKm, 
+            vehicleType = 'standard',
+            email,
+            date,
+            time,
+            passengers,
+            luggage
+        } = req.body;
+
+        // Validate required fields
+        if (!pickup || !destination || !distanceKm || !email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Alle vereiste velden moeten worden ingevuld'
+            });
+        }
+
+        // Calculate fare
+        const fareCalculation = calculateFare(distanceKm, vehicleType);
+        const totalAmountCents = Math.round(fareCalculation.total * 100);
+
+        console.log('Creating checkout session for:', {
+            pickup,
+            destination,
+            distance: distanceKm,
+            vehicleType,
+            totalAmount: fareCalculation.total
+        });
+
+        // Create Stripe Checkout Session
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card', 'ideal', 'bancontact'],
+            customer_email: email,
+            line_items: [{
+                price_data: {
+                    currency: 'eur',
+                    product_data: {
+                        name: `${fareCalculation.vehicleName} - TaxiToday`,
+                        description: `Van ${pickup} naar ${destination} (${distanceKm} km)`,
+                        images: ['https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=300&h=200&fit=crop']
+                    },
+                    unit_amount: totalAmountCents
+                },
+                quantity: 1
+            }],
+            mode: 'payment',
+            success_url: `${req.headers.origin}/booking-confirmation.html?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${req.headers.origin}/index.html#booking`,
+            metadata: {
+                pickup,
+                destination,
+                distanceKm: distanceKm.toString(),
+                vehicleType,
+                date: date || '',
+                time: time || '',
+                passengers: passengers || '1',
+                luggage: luggage || '0',
+                fareBreakdown: JSON.stringify(fareCalculation)
+            },
+            billing_address_collection: 'auto',
+            shipping_address_collection: {
+                allowed_countries: ['NL', 'BE', 'DE']
+            }
+        });
+
+        console.log('Checkout session created successfully:', session.id);
+
+        res.json({
+            success: true,
+            sessionId: session.id,
+            url: session.url,
+            fare: fareCalculation
+        });
+
+    } catch (error) {
+        console.error('Error creating checkout session:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Fout bij het aanmaken van de betaalsessie',
+            error: error.message
+        });
+    }
+});
+
+// Retrieve checkout session details
+app.get('/api/checkout-session/:sessionId', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+        
+        const session = await stripe.checkout.sessions.retrieve(sessionId, {
+            expand: ['line_items', 'payment_intent']
+        });
+
+        res.json({
+            success: true,
+            session: {
+                id: session.id,
+                payment_status: session.payment_status,
+                customer_email: session.customer_email,
+                amount_total: session.amount_total,
+                currency: session.currency,
+                metadata: session.metadata,
+                payment_intent: session.payment_intent
+            }
+        });
+    } catch (error) {
+        console.error('Error retrieving checkout session:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Fout bij het ophalen van de betaalsessie'
+        });
+    }
+});
+
+// Create booking after successful payment
+app.post('/api/bookings', async (req, res) => {
+    try {
+        const { session_id, ...bookingData } = req.body;
+        
+        // Verify payment if session_id is provided
+        if (session_id) {
+            const session = await stripe.checkout.sessions.retrieve(session_id);
+            
+            if (session.payment_status !== 'paid') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Betaling niet voltooid'
+                });
+            }
+
+            // Extract booking data from session metadata
+            const metadata = session.metadata;
+            bookingData.pickup = metadata.pickup;
+            bookingData.destination = metadata.destination;
+            bookingData.distanceKm = parseFloat(metadata.distanceKm);
+            bookingData.vehicleType = metadata.vehicleType;
+            bookingData.date = metadata.date;
+            bookingData.time = metadata.time;
+            bookingData.passengers = metadata.passengers;
+            bookingData.luggage = metadata.luggage;
+            bookingData.email = session.customer_email;
+            bookingData.totalAmount = session.amount_total / 100; // Convert from cents
+            bookingData.paymentIntentId = session.payment_intent;
+        }
+
+        console.log('Creating booking with payment verification:', bookingData);
+        const bookingId = 'TX' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+        
+        // Here you would typically save to database
+        // For now, we'll just return success
+        
+        res.json({
+            success: true,
+            message: 'Boeking succesvol aangemaakt!',
+            bookingId: bookingId,
+            paymentStatus: 'paid',
+            booking: {
+                id: bookingId,
+                ...bookingData,
+                status: 'confirmed',
+                createdAt: new Date().toISOString()
+            }
+        });
+    } catch (error) {
+        console.error('Error creating booking:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Fout bij het aanmaken van de boeking'
+        });
+    }
+});
+
 // Existing API routes
 app.post('/api/booking', (req, res) => {
     console.log('New booking request received:', req.body);
@@ -617,146 +864,6 @@ app.get('/api/stripe-config', (req, res) => {
     res.json({
         publishableKey: process.env.STRIPE_PUBLISHABLE_KEY
     });
-});
-
-// Stripe payment intent creation
-app.post('/api/create-payment-intent', async (req, res) => {
-    try {
-        const { amount, currency, metadata } = req.body;
-
-        // Validate amount
-        if (!amount || amount < 50) { // Minimum 50 cents
-            return res.status(400).json({
-                error: 'Invalid amount',
-                message: 'Amount must be at least 50 cents'
-            });
-        }
-
-        console.log('Creating payment intent for amount:', amount);
-
-        // Create a PaymentIntent with the order amount and currency
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(amount * 100), // Convert to cents
-            currency: currency || 'eur',
-            metadata: metadata || {},
-            automatic_payment_methods: {
-                enabled: true,
-            },
-        });
-
-        console.log('Payment intent created successfully:', paymentIntent.id);
-
-        res.json({
-            client_secret: paymentIntent.client_secret,
-            payment_intent_id: paymentIntent.id
-        });
-    } catch (error) {
-        console.error('Error creating payment intent:', error);
-        res.status(500).json({ 
-            error: 'Failed to create payment intent',
-            message: error.message 
-        });
-    }
-});
-
-// Create payment session for alternative payment methods
-app.post('/api/create-payment-session', async (req, res) => {
-    try {
-        const { payment_method, amount, currency, booking_data, success_url, cancel_url } = req.body;
-
-        const sessionConfig = {
-            line_items: [{
-                price_data: {
-                    currency: currency || 'eur',
-                    product_data: {
-                        name: 'TaxiToday Rit',
-                        description: `Van ${booking_data.pickup} naar ${booking_data.destination}`,
-                    },
-                    unit_amount: Math.round(amount * 100), // Convert to cents
-                },
-                quantity: 1,
-            }],
-            mode: 'payment',
-            success_url: success_url + '?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url: cancel_url,
-            metadata: {
-                booking_data: JSON.stringify(booking_data)
-            },
-            customer_email: booking_data.email
-        };
-
-        // Set payment method types based on selection
-        switch (payment_method) {
-            case 'ideal':
-                sessionConfig.payment_method_types = ['ideal'];
-                break;
-            case 'bancontact':
-                sessionConfig.payment_method_types = ['bancontact'];
-                break;
-            case 'paypal':
-                sessionConfig.payment_method_types = ['paypal'];
-                break;
-            default:
-                sessionConfig.payment_method_types = ['card'];
-        }
-
-        const session = await stripe.checkout.sessions.create(sessionConfig);
-
-        res.json({ url: session.url, session_id: session.id });
-    } catch (error) {
-        console.error('Error creating payment session:', error);
-        res.status(500).json({ 
-            error: 'Failed to create payment session',
-            message: error.message 
-        });
-    }
-});
-
-// Enhanced bookings endpoint with payment verification
-app.post('/api/bookings', async (req, res) => {
-    try {
-        const { payment_intent_id, session_id, payment_status, ...bookingData } = req.body;
-        
-        // Verify payment if payment_intent_id or session_id is provided
-        if (payment_intent_id) {
-            const paymentIntent = await stripe.paymentIntents.retrieve(payment_intent_id);
-            
-            if (paymentIntent.status !== 'succeeded') {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Payment not completed'
-                });
-            }
-        } else if (session_id) {
-            const session = await stripe.checkout.sessions.retrieve(session_id);
-            
-            if (session.payment_status !== 'paid') {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Payment not completed'
-                });
-            }
-        }
-
-        console.log('New booking with payment:', bookingData);
-        const bookingId = 'TX' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-        
-        // Here you would typically save to database
-        // For now, we'll just return success
-        
-        res.json({
-            success: true,
-            message: 'Booking created successfully!',
-            bookingId: bookingId,
-            paymentStatus: payment_status || 'paid'
-        });
-    } catch (error) {
-        console.error('Error creating booking:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to create booking'
-        });
-    }
 });
 
 // Get booking confirmation details
@@ -794,15 +901,15 @@ app.post('/api/stripe-webhook', express.raw({type: 'application/json'}), (req, r
 
     // Handle the event
     switch (event.type) {
+        case 'checkout.session.completed':
+            const session = event.data.object;
+            console.log('Checkout session completed:', session.id);
+            // Handle completed checkout session - create booking automatically
+            break;
         case 'payment_intent.succeeded':
             const paymentIntent = event.data.object;
             console.log('Payment succeeded:', paymentIntent.id);
             // Handle successful payment - update booking status in database
-            break;
-        case 'checkout.session.completed':
-            const session = event.data.object;
-            console.log('Checkout session completed:', session.id);
-            // Handle completed checkout session - create booking
             break;
         case 'payment_intent.payment_failed':
             const failedPayment = event.data.object;
@@ -838,4 +945,5 @@ app.listen(PORT, () => {
     console.log(`Stripe integration enabled with key: ${process.env.STRIPE_SECRET_KEY ? 'sk_test_***' : 'NOT SET'}`);
     console.log(`Google OAuth enabled: ${process.env.GOOGLE_CLIENT_ID ? 'YES' : 'NO'}`);
     console.log(`Email service configured: ${process.env.EMAIL_USER ? 'YES' : 'NO'}`);
+    console.log('Dynamic pricing system active with vehicle types:', Object.keys(PRICING_CONFIG));
 });
