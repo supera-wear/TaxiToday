@@ -2,6 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const session = require('express-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // Load environment variables first
 require('dotenv').config();
@@ -9,11 +15,105 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+// In-memory user storage (in production, use a proper database)
+const users = [];
+
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Session configuration
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'taxitoday-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // Set to true in production with HTTPS
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
+// Passport configuration
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Passport Local Strategy
+passport.use(new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password'
+}, async (email, password, done) => {
+    try {
+        const user = users.find(u => u.email === email);
+        if (!user) {
+            return done(null, false, { message: 'Gebruiker niet gevonden' });
+        }
+
+        const isValidPassword = await bcrypt.compare(password, user.password);
+        if (!isValidPassword) {
+            return done(null, false, { message: 'Onjuist wachtwoord' });
+        }
+
+        return done(null, user);
+    } catch (error) {
+        return done(error);
+    }
+}));
+
+// Passport Google Strategy
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "/api/auth/google/callback"
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        // Check if user already exists
+        let user = users.find(u => u.googleId === profile.id);
+        
+        if (user) {
+            return done(null, user);
+        }
+
+        // Check if user exists with same email
+        user = users.find(u => u.email === profile.emails[0].value);
+        
+        if (user) {
+            // Link Google account to existing user
+            user.googleId = profile.id;
+            return done(null, user);
+        }
+
+        // Create new user
+        const newUser = {
+            id: users.length + 1,
+            googleId: profile.id,
+            name: profile.displayName,
+            email: profile.emails[0].value,
+            avatar: profile.photos[0].value,
+            provider: 'google',
+            createdAt: new Date()
+        };
+
+        users.push(newUser);
+        return done(null, newUser);
+    } catch (error) {
+        return done(error);
+    }
+}));
+
+// Passport serialization
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+    const user = users.find(u => u.id === id);
+    done(null, user);
+});
 
 // Stripe configuration with proper error handling
 let stripe;
@@ -30,7 +130,212 @@ try {
     process.exit(1);
 }
 
-// API routes
+// Helper function to generate JWT token
+const generateToken = (user) => {
+    return jwt.sign(
+        { 
+            id: user.id, 
+            email: user.email, 
+            name: user.name 
+        },
+        process.env.JWT_SECRET || 'taxitoday-jwt-secret',
+        { expiresIn: '24h' }
+    );
+};
+
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ success: false, message: 'Access token required' });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET || 'taxitoday-jwt-secret', (err, user) => {
+        if (err) {
+            return res.status(403).json({ success: false, message: 'Invalid token' });
+        }
+        req.user = user;
+        next();
+    });
+};
+
+// Auth routes
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        // Validate input
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Alle velden zijn verplicht'
+            });
+        }
+
+        // Check if user already exists
+        const existingUser = users.find(u => u.email === email);
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'Er bestaat al een account met dit e-mailadres'
+            });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        // Create new user
+        const newUser = {
+            id: users.length + 1,
+            name,
+            email,
+            password: hashedPassword,
+            provider: 'local',
+            createdAt: new Date()
+        };
+
+        users.push(newUser);
+
+        // Generate token
+        const token = generateToken(newUser);
+
+        // Remove password from response
+        const userResponse = { ...newUser };
+        delete userResponse.password;
+
+        res.json({
+            success: true,
+            message: 'Account succesvol aangemaakt',
+            token,
+            user: userResponse
+        });
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Er is een fout opgetreden bij het aanmaken van uw account'
+        });
+    }
+});
+
+app.post('/api/auth/login', passport.authenticate('local'), (req, res) => {
+    try {
+        const token = generateToken(req.user);
+        
+        // Remove password from response
+        const userResponse = { ...req.user };
+        delete userResponse.password;
+
+        res.json({
+            success: true,
+            message: 'Succesvol ingelogd',
+            token,
+            user: userResponse
+        });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Er is een fout opgetreden bij het inloggen'
+        });
+    }
+});
+
+// Google OAuth routes
+app.get('/api/auth/google',
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+app.get('/api/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login.html?error=google_auth_failed' }),
+    (req, res) => {
+        try {
+            const token = generateToken(req.user);
+            
+            // Set token in cookie for frontend
+            res.cookie('token', token, {
+                httpOnly: false,
+                secure: false, // Set to true in production
+                maxAge: 24 * 60 * 60 * 1000 // 24 hours
+            });
+
+            // Redirect to profile or home page
+            res.redirect('/profile.html');
+        } catch (error) {
+            console.error('Google auth callback error:', error);
+            res.redirect('/login.html?error=auth_failed');
+        }
+    }
+);
+
+app.post('/api/auth/logout', (req, res) => {
+    req.logout((err) => {
+        if (err) {
+            return res.status(500).json({
+                success: false,
+                message: 'Fout bij uitloggen'
+            });
+        }
+        
+        res.clearCookie('token');
+        res.json({
+            success: true,
+            message: 'Succesvol uitgelogd'
+        });
+    });
+});
+
+// Protected user routes
+app.get('/api/user/profile', authenticateToken, (req, res) => {
+    const user = users.find(u => u.id === req.user.id);
+    if (!user) {
+        return res.status(404).json({
+            success: false,
+            message: 'Gebruiker niet gevonden'
+        });
+    }
+
+    const userResponse = { ...user };
+    delete userResponse.password;
+
+    res.json({
+        success: true,
+        user: userResponse
+    });
+});
+
+app.get('/api/user/bookings', authenticateToken, (req, res) => {
+    // Mock booking data - in production, fetch from database
+    const mockBookings = [
+        {
+            bookingId: 'TX123456',
+            date: '2024-06-15',
+            time: '14:30',
+            pickup: 'Amsterdam Central Station',
+            destination: 'Schiphol Airport',
+            price: 65.25,
+            status: 'completed'
+        },
+        {
+            bookingId: 'TX123457',
+            date: '2024-06-10',
+            time: '09:15',
+            pickup: 'Vondelpark, Amsterdam',
+            destination: 'RAI Amsterdam',
+            price: 28.50,
+            status: 'completed'
+        }
+    ];
+
+    res.json({
+        success: true,
+        bookings: mockBookings
+    });
+});
+
+// Existing API routes
 app.post('/api/booking', (req, res) => {
     console.log('New booking request received:', req.body);
     const bookingRef = 'TX' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
@@ -277,4 +582,5 @@ app.get('/:page', (req, res) => {
 app.listen(PORT, () => {
     console.log(`TaxiToday server running on port ${PORT}`);
     console.log(`Stripe integration enabled with key: ${process.env.STRIPE_SECRET_KEY ? 'sk_test_***' : 'NOT SET'}`);
+    console.log(`Google OAuth enabled: ${process.env.GOOGLE_CLIENT_ID ? 'YES' : 'NO'}`);
 });
